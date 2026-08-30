@@ -97,7 +97,7 @@ mod/                          <- new repo/folder, MIT (Spyromain attribution)
 
 **`symbols.ld` — write this first.** It is just `name = 0xADDRESS;` lines.
 Seed it from the CLAUDE.md symbol map, then grow it from
-`decomps/open-spyro/config/symbol_addrs.txt` (613 named functions) as needed.
+`reference/open-spyro/config/symbol_addrs.txt` (613 named functions) as needed.
 
 > **TRAP:** in Spyro2x2, the addresses in the *comments* in `Sp2.h` are the
 > **PAL** build. Each project's `symbols.ld` overrides them (NTSC `sp2_ticks`
@@ -261,7 +261,7 @@ works, then vary it.
 
 ## GamestateDraw, decompiled (2026-08-06)
 
-**`decomps/open-spyro/src/c/GamestateDraw.c` is the single most useful file in
+**`reference/open-spyro/src/c/GamestateDraw.c` is the single most useful file in
 any of the three decomps.** 166 lines of readable C for the exact function we
 hook. Read it before writing any render code.
 

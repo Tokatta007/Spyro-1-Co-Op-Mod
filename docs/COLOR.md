@@ -104,7 +104,7 @@ level, so the pointers differ every time. Only `0x80076378` (the model table)
 and `0x80078A80` (the filter) are fixed. Re-walk the chain rather than reusing
 noted values.
 
-Struct layouts are in `decomps/spyro-1/include/moby.h` (`Model`,
+Struct layouts are in `reference/spyro-1/include/moby.h` (`Model`,
 `AnimationHeader`) and `include/spyro.h` (`m_colorFilter`).
 
 ---

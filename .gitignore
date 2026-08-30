@@ -1,6 +1,5 @@
 # NEVER commit ROMs, discs, or extracted game assets — project rule.
 Roms/
-decomps/
 *.bin
 *.cue
 *.iso
@@ -13,15 +12,17 @@ decomps/
 *.dat
 
 # Build output and extracted disc contents
-spyro1x2/projects/*/build/
-spyro1x2/projects/*/rom/
-spyro1x2/projects/*/disc/
-spyro1x2/projects/*/*.xml
+mod/projects/*/build/
+mod/projects/*/rom/
+mod/projects/*/disc/
+mod/projects/*/*.xml
+
+# External projects we read but never build — each has its own upstream:
+# Spyromain's Spyro2x2, and the three Spyro 1 reverse-engineering efforts.
+reference/
 
 # Downloaded binaries — re-fetchable, and the emulator installer is 45 MB
 tools/
-# Spyromain's reference clone — it has its own upstream repo
-Spyro2x2/
 
 # macOS
 .DS_Store

@@ -8,7 +8,7 @@ code — **that advice was worthless, and anything deleted before 2026-08-30 is
 genuinely gone** (the collision gates were rewritten from these notes once
 because of exactly this). From this commit on, the advice is real.
 `git init` at the project root, first commit = the working state described
-below. `.gitignore` excludes ROMs, discs, extracted assets, `decomps/`,
+below. `.gitignore` excludes ROMs, discs, extracted assets, `reference/`,
 `tools/` (a 45 MB emulator installer) and the `Spyro2x2` reference clone,
 which has its own upstream. **Commit before any experiment**, especially
 before touching the linker script, the memory map, or attempting the decomp
@@ -27,7 +27,7 @@ mod/        the mod itself
 docs/       research; docs/history/ for superseded investigations
 README.md   for anyone cloning: requirements, build, how it works
 ```
-Roms/, decomps/, Spyro2x2/ and tools/ stay untracked.
+Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 
 ## Where things are written down — THREE files now
 
@@ -2156,13 +2156,13 @@ path — always quote it in shell commands.
 ├── Spyro2x2/          <- Spyromain's repo (env.mk, projects/, scripts/, src/)
 ├── mod/               <- OUR Spyro 1 co-op mod. Builds; gate passes.
 ├── tools/             <- mkpsxiso 2.30 macOS binaries (symlinked onto PATH)
-└── decomps/           <- third-party Spyro 1 reverse-engineering references
+└── reference/           <- third-party Spyro 1 reverse-engineering references
     ├── open-spyro/                  <- splat decomp. Best symbol source.
     ├── spyro1-reverse-engineering/  <- C0mposer. Hand-named syms + Ghidra.
     └── spyro-1/                     <- TheMobyCollective. Not yet evaluated.
 ```
 
-Nothing in `decomps/` is ours and nothing there is built — they are read-only
+Nothing in `reference/` is ours and nothing there is built — they are read-only
 references we grep for addresses. Keep our code out of that folder.
 
 **If `Roms/BIOS/` is ever moved, TWO configs must be updated** (neither
@@ -2249,7 +2249,7 @@ arithmetic is untouched.
 
 ## Build
 
-From inside the relevant project directory (`Spyro2x2/projects/rr` for
+From inside the relevant project directory (`reference/Spyro2x2/projects/rr` for
 Ripto's Rage NTSC):
 
 ```
@@ -2313,7 +2313,7 @@ derived by applying Spyromain's official `spyro2x2_rr.xdelta` to the verified
 source ROM above, and that patched file is confirmed working in DuckStation.
 
 Check a build with:
-`shasum "Spyro2x2/projects/rr/build/disc/spyro2x2.bin"`
+`shasum "reference/Spyro2x2/projects/rr/build/disc/spyro2x2.bin"`
 
 ### Result of the first from-source build (2026-08-03)
 
@@ -2366,7 +2366,7 @@ if the ROM is ever replaced.
 
 ### Scope of the port
 
-`Spyro2x2/src/c/Sp2.h` IS the port spec: 112 base-game symbols declared, 109
+`reference/Spyro2x2/src/c/Sp2.h` IS the port spec: 112 base-game symbols declared, 109
 actually used, 9 of those standard PSX library. But usage is very top-heavy —
 `sp2_spyro` alone is referenced 110x, `sp2_camera` 60x. Find the six below and
 you have the backbone; the rest (sparx, flames, mobys) is per-feature and can
@@ -2403,13 +2403,13 @@ Spyro 2 mistake of moving the draw env while leaving the display env behind
 
 ### Reference repos (cloned, stage 3)
 
-- `decomps/open-spyro/` — splat decomp. `config/symbol_addrs.txt` = **613
+- `reference/open-spyro/` — splat decomp. `config/symbol_addrs.txt` = **613
   named functions + globals**, richest source. Matches our ROM exactly.
-- `decomps/spyro1-reverse-engineering/` — C0mposer. `symbols/symbols.txt` (112
+- `reference/spyro1-reverse-engineering/` — C0mposer. `symbols/symbols.txt` (112
   hand-named variables) and `symbols/funcs.txt` (70 funcs). Fewer but
   higher-confidence, human-readable names. Also a Ghidra project and a
   symbol-map website.
-- `decomps/spyro-1/` — TheMobyCollective. **Do not overlook this one.** ~18k
+- `reference/spyro-1/` — TheMobyCollective. **Do not overlook this one.** ~18k
   lines of C across 151 files, and crucially it has real **STRUCT
   DEFINITIONS** (`include/spyro.h`, `moby.h`, ...) where open-spyro has only
   one symbol per address. Function names are `func_8004A200`-style, which made

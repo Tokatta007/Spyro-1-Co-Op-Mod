@@ -73,13 +73,16 @@ the scene build — rather than by teaching the engine about a second character.
 ```
 mod/           the mod: source, build scripts, linker script
 docs/          research notes, and history/ for superseded investigations
+reference/     external projects we read but never build (untracked)
 CHANGES.md     what the mod changes, and what the build verifies
 BUGS.md        open work: active, parked, accepted
 CLAUDE.md      working notes and the investigation log
 ```
 
-`Roms/`, `decomps/`, `Spyro2x2/` and `tools/` are local working directories
-and are deliberately not tracked.
+`Roms/`, `reference/` and `tools/` are local working directories and are
+deliberately not tracked. `reference/` holds the external projects this work
+draws on — Spyromain's mod and the Spyro 1 decompilations — each of which has
+its own upstream repository.
 
 ## Credits
 
