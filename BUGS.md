@@ -139,10 +139,15 @@ release readme, not in a bug tracker.
 
 ## 4. Recently fixed — needs confirmation
 
-**C1 — `Sp1x2FixFocus`** repairs a null `g_Camera.m_Focus` either side of
-player 2's camera update. Counters at `0x8000ED74` (before) and `0x8000ED78`
-(after). The camera spasm persists regardless, so this is not the whole story
-— see P1.
+**C1 — Interrupt-deadlock fix (deferred pad poll).** *Untested — test this first.*
+
+- Spyro's tick and the camera update no longer run with interrupts disabled.
+  The pad callback is held off by a flag and its poll deferred, instead.
+- **Watch for:** input problems for either player — sluggish, dropped or
+  crossed controls. That is what this change touches.
+- **And:** whether the hard freeze (old A2) returns. If it does, the CP0 dump
+  says which kind: Cause 8 with the music stopped means this did not take;
+  a bad address with music playing means the older memory-fault family.
 
 ---
 
