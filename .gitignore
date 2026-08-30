@@ -1,0 +1,27 @@
+# NEVER commit ROMs, discs, or extracted game assets — project rule.
+Roms/
+decomps/
+*.bin
+*.cue
+*.iso
+*.img
+*.exe
+*.EXE
+*.STR
+*.WAD
+*.wad
+*.dat
+
+# Build output and extracted disc contents
+spyro1x2/projects/*/build/
+spyro1x2/projects/*/rom/
+spyro1x2/projects/*/disc/
+spyro1x2/projects/*/*.xml
+
+# Downloaded binaries — re-fetchable, and the emulator installer is 45 MB
+tools/
+# Spyromain's reference clone — it has its own upstream repo
+Spyro2x2/
+
+# macOS
+.DS_Store

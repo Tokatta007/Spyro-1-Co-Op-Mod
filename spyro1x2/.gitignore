@@ -1,0 +1,23 @@
+# NEVER commit ROMs or extracted game assets. Source and build scripts only.
+*.bin
+*.cue
+*.iso
+*.img
+
+# Extracted disc contents and build output
+projects/*/rom/
+projects/*/build/
+projects/*/disc/
+projects/*/*.xml
+
+# Everything the game gave us, by extension
+*.WAD
+*.STR
+*.TRD
+*.EXE
+*.NSD
+*.NSF
+*.VRM
+*.BIG
+*.HWL
+*.dat

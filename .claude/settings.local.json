@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew --version)",
+      "Bash(make --version)",
+      "Bash(git --version)",
+      "Bash(python3 -)",
+      "Bash(mipsel-none-elf-objdump -D -b binary -m mips:3000 -EL --adjust-vma=0x8000f800 --start-address=0x8005b920 --stop-address=0x8005b980 rom/SCUS_942.28)",
+      "Bash(make disc *)",
+      "Bash(make)",
+      "Bash(mipsel-none-elf-nm build/spyro1x2.elf)",
+      "Bash(mipsel-none-elf-objdump -D -b binary -m mips:3000 -EL --adjust-vma=0x8000f800 --start-address=0x8002c924 --stop-address=0x8002c930 build/rom/SCUS_942.28)",
+      "Bash(mipsel-none-elf-objdump -d build/spyro1x2.elf)",
+      "Bash(mkdir -p \"/private/tmp/claude-501/-Users-dave-Documents-Spyro-1---Co-Op-Mod/0a50d6d1-7aca-4a08-a44d-e40c847335bf/scratchpad\")",
+      "Bash(mipsel-none-elf-nm -S --numeric-sort build/spyro1x2.elf)",
+      "Bash(cd \"/Users/dave/Documents/Spyro 1 - Co-Op Mod/spyro1x2/src/c\" && echo \"=== every hold and release ===\" && grep -n \"SP1X2_PAD_HOLD = 1\\\\|Sp1x2PadRelease\\(\\);\" Sp1x2Spyro.c && echo && echo \"=== the camera update's paths ===\" && sed -n '/^void Sp1x2UpdateCameras/,/^}/p' Sp1x2Spyro.c | grep -nE \"PAD_HOLD|PadRelease|return|UpdateCameraFrame|SwapAll|^\\\\}\")"
+    ]
+  }
+}
