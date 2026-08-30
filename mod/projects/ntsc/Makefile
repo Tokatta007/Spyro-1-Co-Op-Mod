@@ -133,6 +133,43 @@ build/rom/%: rom/%
 	$(CP) $< $@
 
 
+# ---- release patch ---------------------------------------------------------
+#
+# What gets distributed. An xdelta patch encodes only the DIFFERENCE between
+# the player's own disc and the modded one, so it carries no game data and is
+# safe to share — the player supplies the game.
+#
+# The target verifies itself: it applies the patch it just made to a fresh
+# copy of the source disc and checks the result matches the built disc
+# byte-for-byte. A patch that does not round-trip is worse than no patch,
+# because it fails on someone else's machine after they have downloaded it.
+
+.PHONY: patch
+patch: build/release/spyro1-coop.xdelta
+
+build/release/spyro1-coop.xdelta: build/disc/spyro1-coop.bin disc/spyro1.bin
+	@$(MKDIR) -p $(@D)
+	@echo "--- building patch ---"
+	xdelta3 -e -9 -f -s disc/spyro1.bin build/disc/spyro1-coop.bin $@
+	@echo "--- verifying it round-trips ---"
+	@xdelta3 -d -f -s disc/spyro1.bin $@ build/release/roundtrip.bin
+	@a=$$(shasum build/disc/spyro1-coop.bin | cut -d' ' -f1); \
+	 b=$$(shasum build/release/roundtrip.bin | cut -d' ' -f1); \
+	 $(RM) -f build/release/roundtrip.bin; \
+	 if [ "$$a" != "$$b" ]; then \
+		echo "  FAIL - patched disc does not match the built disc"; \
+		echo "         built:   $$a"; \
+		echo "         patched: $$b"; exit 1; \
+	 fi; \
+	 echo "  PASS - patch reproduces the build exactly ($$a)"
+	@$(CP) build/disc/spyro1-coop.cue build/release/spyro1-coop.cue
+	@src=$$(shasum disc/spyro1.bin | cut -d' ' -f1); \
+	 sz=$$(wc -c < $@ | tr -d ' '); \
+	 echo "  patch:  $@ ($$sz bytes)"; \
+	 echo "  source: expects a disc with SHA-1 $$src"
+
+
+
 # ---- setup / clean ---------------------------------------------------------
 
 .PHONY: setup

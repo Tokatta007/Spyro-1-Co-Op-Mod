@@ -33,11 +33,11 @@ repository.
 The mod is distributed as a **patch** you apply to your own disc image — you
 will not need to build anything or touch a compiler.
 
-> **Not released yet.** Patch releases will appear on the
-> [Releases](../../releases) page once the remaining freeze is resolved. Until
-> then this repository is source only.
+> **Not released yet.** Patches will appear on the [Releases](../../releases)
+> page. The build pipeline for them exists and is verified; what is left is
+> finishing the open items in [BUGS.md](BUGS.md).
 
-When it is ready you will need:
+You will need:
 
 - Your own copy of *Spyro the Dragon (USA)* as a `.bin`/`.cue` disc image.
   Verified against SHA-1 `cf3ce6bedeb89dfbc40990336180f3b9b0f40d9f`.
@@ -46,6 +46,13 @@ When it is ready you will need:
 - An emulator or real hardware. **DuckStation** is what this is tested on.
 - Two controllers. A CPU overclock of around 300% helps the framerate in busy
   scenes; do not go above it.
+
+Apply the `.xdelta` to your `.bin`, keep the supplied `.cue` beside the
+result, and open the `.cue` in your emulator.
+
+The patch is around 13 KB. That is the whole mod — it contains none of the
+game, only the difference between your disc and the modded one, which is why
+it can be shared when the game itself cannot.
 
 ## How it works
 
@@ -97,6 +104,11 @@ make disc      # repacks the playable disc
 ```
 
 `make` alone does **not** produce a playable disc — `make disc` does.
+`make patch` then produces the distributable `.xdelta` in `build/release/`,
+and verifies it by applying it to a fresh copy of the source disc and checking
+the result matches the build byte-for-byte. A patch that does not round-trip
+is worse than none, because it fails on someone else's machine after they have
+already downloaded it.
 
 Every build verifies itself: that only the intended instructions changed, that
 each hook reaches the function it names, that no memory allocations overlap,

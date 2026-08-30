@@ -340,6 +340,25 @@ spasm nor any crash, and this freeze had nothing to do with the focus.
 `Sp1x2MaskWalk` and `Sp1x2SyncMobyFlags` were relocated between regions to fit.
 Confidence: `?` untested.
 
+## 5f. Added 2026-08-30 — release patch pipeline
+
+`make patch` produces `build/release/spyro1-coop.xdelta`, the distributable
+artifact, plus a copy of the `.cue`.
+
+An xdelta patch encodes only the **difference** between the player's own disc
+and the modded one, so it carries no game data. Measured: **13,111 bytes** for
+a 661 MB disc — consistent with it containing our 10,240-byte payload, the 24
+patched instructions and xdelta's own overhead, and nothing else.
+
+**The target verifies itself.** It applies the patch it just built to a fresh
+copy of the source disc and checks the result matches the built disc
+byte-for-byte, failing the build if not. A patch that does not round-trip is
+worse than no patch, because it fails on a stranger's machine after they have
+downloaded it. It also prints the source disc's SHA-1, so the release notes
+can state exactly which copy of the game the patch expects.
+
+Requires `xdelta3` (`brew install xdelta` on macOS).
+
 ## 6. Build verification — what `make` checks every time
 
 `scripts/verify.py` runs at the end of every `make`. Each check exists because
