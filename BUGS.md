@@ -35,25 +35,6 @@ Genuinely broken, nobody has decided to live with it. Worst first.
 
 ---
 
-**A2 — Rare hard freeze: screen stops AND music stops.**
-
-- **Different from all previous freezes** — those kept playing music. CP0 at
-  the freeze: Cause 0x20 (**syscall**), BadVAddr 0, EPC `0x8005DBA8`, which
-  disassembles to the `syscall` inside **EnterCriticalSection**. Music
-  stopping means interrupts are off: this is a DEADLOCK, not corruption.
-- **Cause (ours):** we wrap whole game functions in critical sections —
-  `TickSpyroGameplayFrame` in `Sp1x2TickPlayer2Spyro`, `UpdateCameraFrame` in
-  `Sp1x2UpdateCameras`. Those can trigger sounds, deaths, level loads and
-  raycasts. Anything inside that waits on an interrupt waits forever.
-- **Why they are wide:** the pad callback runs in the VSync interrupt and
-  swaps pad state; if it fires while player 2 is swapped in it polls the wrong
-  player. Deliberate, but too broad.
-- **Next step:** redesign, do not patch. Narrowing the sections reopens the
-  callback race; a flag that makes the callback skip would drop input often.
-  A deferred poll (callback marks intent, main loop polls after the swaps) is
-  the likely shape. Needs space and care.
-
----
 
 ## 2. Parked
 

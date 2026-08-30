@@ -47,6 +47,35 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## DEADLOCK FIX CONFIRMED 2026-08-30 (user: no freeze, controls fine)
+
+The deferred pad poll works. Interrupts stay enabled, the hard freeze is gone,
+and input feels normal for both players. **A2 is closed.**
+
+## CAMERA SPASM — one more theory RULED OUT, and the best remaining lead
+
+RULED OUT: "a death or game over leaves the state crossed, and clearing
+SP1X2_P2_READY disables the swap that would uncross it". It explained one
+session and contradicted the next, and one address read finished it:
+**0x8000ED00 reads 1 throughout**, so the swap was never disabled. Cost: one
+memory read instead of three builds. Keep doing that.
+**THE BEST REMAINING LEAD, and it is grounded in measurement rather than
+reasoning.** We know from the focus probe that during a spasm
+`g_Camera.m_Focus` is NULL and the camera is dutifully following address zero.
+We also know WHERE that null comes from: `func_8003FE40` (inside Spyro's tick)
+sets camera mode 0x8000000A together with
+    m_Focus = <the pointer at g_Spyro + 0x21C>
+and that field is **NULL for player 2**, because he never entered the sequence
+that fills it. Repairing the focus either side of the camera update did NOT
+help — consistent with the null being installed DURING the update and consumed
+before we get to look again.
+So the fix to try is not another repair but **stopping the null from being
+installed**: give player 2 a valid pointer at `g_Spyro + 0x21C` when he is
+seeded (the natural value being `&g_Spyro.m_Position`, which is what the
+normal camera mode uses), or refuse mode 0x8000000A for a player whose actor
+pointer is null. UNTESTED, and it is attempt ~12 on this bug, so measure that
+the field really is null for player 2 before building anything.
+
 ## A NEW CRASH CLASS, 2026-08-30: INTERRUPT DEADLOCK, NOT MEMORY CORRUPTION
 
 User CP0 dump at a freeze: **Cause 0x20 (ExcCode 8 = SYSCALL), BadVAddr 0,
