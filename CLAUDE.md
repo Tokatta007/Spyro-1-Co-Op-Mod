@@ -1,5 +1,19 @@
 # Spyro Co-op Mod Project
 
+## VERSION CONTROL — created 2026-08-30, and it did not exist before
+
+**There was no git repository for the entire project until now.** That matters
+because this file repeatedly says "resurrect from git history" when retiring
+code — **that advice was worthless, and anything deleted before 2026-08-30 is
+genuinely gone** (the collision gates were rewritten from these notes once
+because of exactly this). From this commit on, the advice is real.
+`git init` at the project root, first commit = the working state described
+below. `.gitignore` excludes ROMs, discs, extracted assets, `decomps/`,
+`tools/` (a 45 MB emulator installer) and the `Spyro2x2` reference clone,
+which has its own upstream. **Commit before any experiment**, especially
+before touching the linker script, the memory map, or attempting the decomp
+pivot.
+
 ## Where things are written down — THREE files now
 
 - **`CHANGES.md`** — what the mod changes (hooks, memory map, swapped state),
