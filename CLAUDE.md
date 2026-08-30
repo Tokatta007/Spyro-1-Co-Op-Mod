@@ -14,6 +14,15 @@ which has its own upstream. **Commit before any experiment**, especially
 before touching the linker script, the memory map, or attempting the decomp
 pivot.
 
+## Commit convention (user preference, 2026-08-30)
+
+**Do NOT add a `Co-Authored-By: Claude` trailer to commits.** The user finds
+it odd to credit a tool on every commit, and CLAUDE.md already makes the
+working method obvious to anyone reading the repository. Commits are authored
+as `Tokatta007 <Tokatta007@users.noreply.github.com>` — the local repo config
+is set, so this happens automatically. The real name and personal email must
+not appear in the history.
+
 ## Project layout (renamed and restructured 2026-08-30)
 
 The mod folder is now **`mod/`**, not `spyro1x2/` — the old name only ever
