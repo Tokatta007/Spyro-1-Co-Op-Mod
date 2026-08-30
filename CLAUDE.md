@@ -14,6 +14,21 @@ which has its own upstream. **Commit before any experiment**, especially
 before touching the linker script, the memory map, or attempting the decomp
 pivot.
 
+## Project layout (renamed and restructured 2026-08-30)
+
+The mod folder is now **`mod/`**, not `spyro1x2/` — the old name only ever
+referenced Spyromain's mod and meant nothing on its own. Build outputs are
+`spyro1-coop.bin/.cue`, the linker script is `coop.ld`. **The `Sp1x2` prefix
+on function names was deliberately NOT renamed**: 71 symbols across every
+source file plus the assembly hook list, for zero user-visible benefit and a
+real chance of breaking a hook. It is internal.
+```
+mod/        the mod itself
+docs/       research; docs/history/ for superseded investigations
+README.md   for anyone cloning: requirements, build, how it works
+```
+Roms/, decomps/, Spyro2x2/ and tools/ stay untracked.
+
 ## Where things are written down — THREE files now
 
 - **`CHANGES.md`** — what the mod changes (hooks, memory map, swapped state),
@@ -510,7 +525,7 @@ Update this section as things progress.
 - [x] Spyro 1 ROM verified against open-spyro's baseline
 - [x] Reference repos cloned; six backbone symbols mapped
 - [x] ~18 KB of free BIOS RAM confirmed in PCSX-Redux (title screen + in-level)
-- [x] `spyro1x2/` skeleton builds; **byte-identical rebuild gate PASSES**
+- [x] `mod/` skeleton builds; **byte-identical rebuild gate PASSES**
 - [x] Rebuilt disc boots in DuckStation and plays like retail (2026-08-06)
 - [x] **First hook WORKS (2026-08-06).** `Sp1x2Graphics` wraps `GamestateDraw`
       at `0x8000b0f0`. Confirmed in PCSX-Redux: `0xDEADBEEF` at `0x8000C000`
@@ -753,7 +768,7 @@ it look native). The code ceiling at 0x8000E000 cannot be raised.
 
 **PROCESS TRAP, cost a full cycle: `make` STOPS AT THE GATE. It does NOT
 repack the disc; `make disc` does.** Check build/rom/SCUS_942.28 against
-build/disc/spyro1x2.bin timestamps before asking anyone to test.
+build/disc/spyro1-coop.bin timestamps before asking anyone to test.
 
 **LESSON 2026-08-23, expensive:** during the space crunch a NULL CHECK was
 deleted to save FOUR BYTES on a "provably set" argument — and the proof was
@@ -1941,7 +1956,7 @@ lives shared, level transitions clean. Remaining COSMETIC punch list:
    **PROCESS TRAP THAT COST A CYCLE: `make` stops at the verification gate —
    it does NOT repack the disc. `make disc` does.** A change was reported as
    failing when the disc under test was 18 minutes stale. Check
-   `build/rom/SCUS_942.28` against `build/disc/spyro1x2.bin` timestamps.
+   `build/rom/SCUS_942.28` against `build/disc/spyro1-coop.bin` timestamps.
 1. ~~P2 one-shot sound truncation~~ DONE 2026-08-18 — hook 6 redirects the
    `jal VecMagnitude` in TickActiveSoundVoices to a min-over-both-cameras
    distance, so a sound near EITHER player is near. Vanilla kill radius.
@@ -2122,7 +2137,7 @@ lives shared, level transitions clean. Remaining COSMETIC punch list:
    Player count joins this page when 3/4-player rendering exists.
 - [ ] Port the swap logic; two cameras rendering
 
-Build with: `cd spyro1x2/projects/ntsc && make setup && make`
+Build with: `cd mod/projects/ntsc && make setup && make`
 Full details and the gate's ongoing use: `SPYRO1_PORT_PLAN.md`.
 
 ## Folder layout
@@ -2139,7 +2154,7 @@ path — always quote it in shell commands.
 │   │                      is for playing, NEVER for building from)
 │   └── BIOS/          <- SCPH1001.BIN. BOTH emulators point here.
 ├── Spyro2x2/          <- Spyromain's repo (env.mk, projects/, scripts/, src/)
-├── spyro1x2/          <- OUR Spyro 1 co-op mod. Builds; gate passes.
+├── mod/               <- OUR Spyro 1 co-op mod. Builds; gate passes.
 ├── tools/             <- mkpsxiso 2.30 macOS binaries (symlinked onto PATH)
 └── decomps/           <- third-party Spyro 1 reverse-engineering references
     ├── open-spyro/                  <- splat decomp. Best symbol source.

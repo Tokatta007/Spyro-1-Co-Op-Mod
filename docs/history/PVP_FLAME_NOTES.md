@@ -162,7 +162,7 @@ build). Specifically:
 ## Process notes worth keeping
 
 - **Check `make disc` ran.** Comparing `build/rom/SCUS_942.28` against
-  `build/disc/spyro1x2.bin` timestamps catches a stale disc instantly. An
+  `build/disc/spyro1-coop.bin` timestamps catches a stale disc instantly. An
   untested change reported as "not working" costs a whole cycle and, worse,
   discards a theory that was never actually tried.
 - The five-marker diagnostic (setting / call count / both flame flags /

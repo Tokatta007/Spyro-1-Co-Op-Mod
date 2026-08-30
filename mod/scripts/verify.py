@@ -42,7 +42,7 @@ import sys
 
 ORIG = "rom/SCUS_942.28"
 BUILT = "build/rom/SCUS_942.28"
-ELF = "build/spyro1x2.elf"
+ELF = "build/spyro1-coop.elf"
 MAIN_S = "src/asm/main.S"
 
 LOAD_ADDR = 0x80010000

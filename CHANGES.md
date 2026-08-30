@@ -26,13 +26,13 @@ the game's own pause menu. **No original code is rewritten.**
   or the BIOS freezes at the PlayStation logo.
 
 ```
-cd "spyro1x2/projects/ntsc"
+cd "mod/projects/ntsc"
 make          # builds the executable + runs the verification gate ONLY
-make disc     # repacks build/disc/spyro1x2.bin — the playable disc
+make disc     # repacks build/disc/spyro1-coop.bin — the playable disc
 ```
 
 - `make` alone does **not** produce a playable disc. Before handing a build to
-  anyone, check `build/disc/spyro1x2.bin` is newer than `build/rom/SCUS_942.28`.
+  anyone, check `build/disc/spyro1-coop.bin` is newer than `build/rom/SCUS_942.28`.
 - `make clean` after changing any compiler flag — the Makefile does not track them.
 - The gate bounds *how many* bytes changed, not *where*. It cannot catch a hook
   placed four bytes off. Disassemble `build/rom/SCUS_942.28` at every new hook.
@@ -88,7 +88,7 @@ Confidence: **OK** confirmed · **OK\*** works, known limits · **?** unproven �
 
 ## 3. Table 2 — Memory map
 
-### Code regions (`projects/ntsc/spyro1x2.ld`)
+### Code regions (`projects/ntsc/coop.ld`)
 
 | Range | Size | Contents | Used |
 | --- | --- | --- | --- |
@@ -374,8 +374,8 @@ build and vanilla Spyro 1 is accounted for:**
 | Change | File | Effect |
 | --- | --- | --- |
 | `-ffunction-sections -fdata-sections` added | `env.mk` | Each function gets its own section so the linker packs them without per-object padding. **+152 bytes, all in BIOS2B.** Verified safe by a symbol-by-symbol diff: nothing was dropped. |
-| `.o(.text)` -> `.o(.text .text.*)` | `spyro1x2.ld` | Required by the above — with function-sections the code lands in `.text.<name>`, and `--orphan-handling=discard` would otherwise silently delete it. |
-| `.rodata` moved BIOS2 -> BIOS2B | `spyro1x2.ld` | **+240 bytes in BIOS2**, the region that was full. Costs nothing: `-G0` addresses all data absolutely, so relocating it changes a constant, never an instruction — the functions are byte-identical either side. |
+| `.o(.text)` -> `.o(.text .text.*)` | `coop.ld` | Required by the above — with function-sections the code lands in `.text.<name>`, and `--orphan-handling=discard` would otherwise silently delete it. |
+| `.rodata` moved BIOS2 -> BIOS2B | `coop.ld` | **+240 bytes in BIOS2**, the region that was full. Costs nothing: `-G0` addresses all data absolutely, so relocating it changes a constant, never an instruction — the functions are byte-identical either side. |
 | Unsigned halving in `Sp1x2SetViewport` | `Sp1x2Graphics.c` | **+64 bytes.** Dividing a *signed* value by two makes the compiler emit a round-toward-zero correction at each of six sites; a screen width is never negative, so the correction was dead weight. |
 | `Sp1x2SwapAll()` helper | `Sp1x2Spyro.c` | **+28 bytes.** Four sites wrote the camera+Spyro+pad swap longhand in opposing orders. The three swap sets were verified to touch **no overlapping memory** (nearest approach: `g_CollisionNormal` ends 0x80077377, `g_Pad` starts 0x80077378), so order is irrelevant and one helper serves all. |
 | `scripts/rm.py` restored | new file | **`make clean` had been broken since the start** — `env.mk` defines `RM = python rm.py` but the file did not exist, so every `make clean` failed. It fails loudly on the command line but was easy to miss when output was redirected. The visible symptom was a stale-object link error after editing a header, which `make clean` was supposed to fix and could not. |

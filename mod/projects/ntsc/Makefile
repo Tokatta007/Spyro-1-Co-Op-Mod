@@ -70,7 +70,7 @@ verify: build/rom/SCUS_942.28
 		echo "  Either a .incbin length in main.S is wrong, or the payload"; \
 		echo "  size disagrees with t_size in header.S."; exit 1; \
 	else echo "  size: $$new = $$orig original + $(PAYLOAD_BYTES) payload"; fi
-	@hex=$$($(OBJDUMP) -h build/spyro1x2.elf | awk '$$2 == ".header" {print $$3}'); \
+	@hex=$$($(OBJDUMP) -h build/spyro1-coop.elf | awk '$$2 == ".header" {print $$3}'); \
 	used=$$((16#$$hex)); \
 	echo "  LOADER region: $$used of 2048 bytes used ($$((2048 - used)) free)"
 	@orig=$$(wc -c < rom/SCUS_942.28 | tr -d ' '); \
@@ -97,11 +97,11 @@ verify: build/rom/SCUS_942.28
 
 # ---- executable ------------------------------------------------------------
 
-build/rom/SCUS_942.28: build/spyro1x2.elf
+build/rom/SCUS_942.28: build/spyro1-coop.elf
 	@$(MKDIR) -p $(@D)
 	$(OBJCOPY) -O binary -j .header -j .main -j .bios2 -j .bios2b --pad-to=0x68800 $< $@
 
-build/spyro1x2.elf: spyro1x2.ld symbols.ld $(MAINOBJ)
+build/spyro1-coop.elf: coop.ld symbols.ld $(MAINOBJ)
 	@$(MKDIR) -p $(@D)
 	$(LD) --orphan-handling=discard -T $< -o $@
 
@@ -118,13 +118,13 @@ build/src/c/%.o: ../../src/c/%.c
 # ---- disc ------------------------------------------------------------------
 
 .PHONY: disc
-disc: build/disc/spyro1x2.bin
+disc: build/disc/spyro1-coop.bin
 
-build/disc/spyro1x2.bin: build/spyro1x2.xml $(DISCLIST)
+build/disc/spyro1-coop.bin: build/spyro1-coop.xml $(DISCLIST)
 	@$(MKDIR) -p $(@D)
-	$(MKPSXISO) -y -lba build/spyro1x2.lba -c build/disc/spyro1x2.cue -o $@ $<
+	$(MKPSXISO) -y -lba build/spyro1-coop.lba -c build/disc/spyro1-coop.cue -o $@ $<
 
-build/spyro1x2.xml: ../../scripts/create_mkpsxiso_xml.py spyro1.xml $(DISCLIST)
+build/spyro1-coop.xml: ../../scripts/create_mkpsxiso_xml.py spyro1.xml $(DISCLIST)
 	@$(MKDIR) -p $(@D)
 	$(PYTHON) $< spyro1.xml $@
 
