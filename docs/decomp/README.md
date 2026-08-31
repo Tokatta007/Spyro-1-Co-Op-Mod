@@ -98,3 +98,37 @@ Options, none yet tried:
   the overlay base rather than absolutely. Mechanical, 44 lines. Ours to do
   for our own reasons; see above for why it is not an upstream matter.
 - **Wait**, since the pins disappear as overlays get decompiled.
+
+## Getting a modified overlay onto the disc — SOLVED, and easier than feared
+
+Our disc pipeline copies `WAD.WAD` as one 110 MB blob and knows nothing about
+its contents, so changing an overlay looked like it needed the WAD format
+reverse-engineered. It does not.
+
+**Every overlay appears verbatim, exactly once, at a sector-aligned offset.**
+Measured against a matching build:
+
+| overlay | size | offset in WAD.WAD |
+| --- | --- | --- |
+| `level_0_artisans_home_code.ovl` | 57,344 | `0x7F2800` |
+| `level_5_artisans_sunny_flight_code.ovl` | 43,008 | `0x16A8000` |
+| `level_11_peace_keepers_night_flight_code.ovl` | 38,912 | `0x258F800` |
+
+So the procedure is: build matching to get the retail bytes, search `WAD.WAD`
+for them to find the offset, then write the modified overlay there. No format
+knowledge required, and the search doubles as a check that we are patching the
+right thing.
+
+**Budget for growing a flight overlay in place** — trailing padding, which is
+what an edit can expand into before it would disturb anything after it:
+
+| flight overlay | size | free |
+| --- | --- | --- |
+| night flight | 38,912 | 1,604 |
+| crystal flight | 40,960 | 1,700 |
+| sunny flight | 43,008 | 868 |
+| wild flight | 40,960 | 496 |
+| icy flight | 40,960 | 256 |
+
+Icy flight is the tight one at 256 bytes. A per-viewport HUD reposition should
+fit, but it is worth checking the worst case first rather than last.
