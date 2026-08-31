@@ -2,10 +2,11 @@
 
 Split-screen co-op for **Spyro the Dragon** (PlayStation, NTSC).
 
-As it stands: drop-in drop-out split-screen co-op is fairly functional, with
-only a few minor bugs. This includes a Multiplayer settings page inside the
-game's own pause menu to configure settings. **The goal is up to four players
-in split-screen, and to release this on OpenPete.**
+This mod features drop-in drop-out split-screen co-op that is fairly
+functional, with only a few minor bugs. This includes a Multiplayer settings
+page to customize your experience. Currently it is for only 2 players, but
+**the goal is up to four players in split-screen, and to release this on
+OpenPete.**
 
 Built by studying and porting the architecture of
 [Spyromain's incredible Spyro2x2 mod](https://github.com/Spyromain/Spyro2x2),
@@ -16,22 +17,22 @@ preserved.
 
 ## What works today
 
-- Two players, independent movement, cameras and Sparx
-- Horizontal or vertical split, three view-fit modes, optional 16:9 widescreen
-- Drop-in / drop-out: switch between one and two players from the pause menu
-- Enemies, gems and fodder react to the nearest player
+- Two players, independent movement, cameras, and Sparx
+- Horizontal or vertical split, three view-fit modes, and optional 16:9
+  widescreen
+- Drop-in / drop-out Co-Op: switch between one and two players from the pause
+  menu
+- Enemies, gems, and fodder react to the nearest player
 - Shared lives, with individual death and respawn
-- Dragon rescues, the balloonist, portals and level transitions all handled
+- Dragon rescues, the balloonist, portals, and level transitions all handled
 
 [BUGS.md](BUGS.md) lists what is still open, including two parked issues: a
 camera glitch on some hits, and pitch control in the flight levels.
 
 ## Playing it
 
-You supply your own copy of the game. No game data is included in this
-repository.
-
-The mod is distributed as a **patch** you apply to your own disc image.
+The mod is distributed as a **patch** you apply to your own disc image. No
+game data is included in this repository.
 
 You will need:
 
@@ -40,8 +41,8 @@ You will need:
 - An xdelta patcher, such as
   [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher).
 - An emulator or real hardware. **DuckStation** is what this is tested on.
-- Two controllers. A CPU overclock of around 300% helps the framerate in busy
-  scenes; do not go above it or it could result in crashes.
+- Two controllers. A CPU overclock of 300% is recommended to keep the
+  framerate high. It's best to not go above it or it could result in crashes.
 
 Apply the `.xdelta` to your `.bin`, keep the supplied `.cue` beside the
 result, and open the `.cue` in your emulator.
@@ -56,7 +57,7 @@ the executable's declared size so the BIOS loads an extra payload, which a
 boot stub copies into place before the game starts.
 
 Player 2 exists by running the game's own logic twice per frame with a second
-set of state swapped in: Spyro's tick, the camera update, the moby pass and
+set of state swapped in: Spyro's tick, the camera update, the moby pass, and
 the scene build. The engine is never taught about a second character.
 
 [CHANGES.md](CHANGES.md) documents every hook, the memory map, and the
@@ -65,7 +66,7 @@ per-player state.
 ## Layout
 
 ```
-mod/           the mod: source, build scripts, linker script
+mod/           the mod: source, build scripts, and linker script
 docs/          research notes, and history/ for superseded investigations
 reference/     external projects we read but never build (untracked)
 CHANGES.md     what the mod changes, and what the build verifies
@@ -73,7 +74,7 @@ BUGS.md        open work: active, parked, accepted
 CLAUDE.md      working notes and the investigation log
 ```
 
-`Roms/`, `reference/` and `tools/` are local working directories and are
+`Roms/`, `reference/`, and `tools/` are local working directories and are
 deliberately not tracked. `reference/` holds the projects this work draws on,
 each of which has its own upstream repository.
 
@@ -109,10 +110,10 @@ and that every hook is documented. See section 6 of [CHANGES.md](CHANGES.md).
 
 ## Contributing
 
-I am an amateur coder working on this in my own time, and I would genuinely
-welcome help. If any of this interests you, please reach out or open a pull
-request. Bug reports and play-testing are just as useful as code, and
-[BUGS.md](BUGS.md) is an honest list of what is still wrong.
+I am a novice coder working on this in my own time, and I would genuinely
+welcome help. If any of this interests you, please reach out, open a pull
+request, or create an issue. Bug reports and play-testing are just as useful
+as code, and [BUGS.md](BUGS.md) is an honest list of what is still wrong.
 
 ## Credits
 
