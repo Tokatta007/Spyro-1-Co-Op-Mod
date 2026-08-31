@@ -16,8 +16,28 @@ Last reviewed: 2026-08-30.
 
 Genuinely broken, nobody has decided to live with it. Worst first.
 
-*Nothing.* The list was cleared on 2026-08-30 when the enemy behaviour near
-player 2 was confirmed normal. Anything new goes here.
+**A2 — The flight-level collectible HUD is mispositioned in split-screen.**
+
+- Reported 2026-08-30: it does not appear at all in the **vertical** split,
+  and is visible but **cut off** in the horizontal one.
+- The shape of that is a HUD drawn at fixed coordinates for a full 512x240
+  screen: in horizontal it overhangs the half-height viewport, and in
+  vertical it sits outside a 256-wide one entirely. Exactly the fault the
+  main HUD had before `Sp1x2HudShift`.
+- **Wanted:** the same treatment as the gems / dragons / lives HUD, which is
+  shifted per viewport and, for the side-by-side split, relaid out per moby.
+- **BLOCKED ON TWO THINGS, in order:**
+  1. *Nobody has found what draws it.* It is **not** `hud.c`, which only
+     handles gems, dragons and lives. The draw path never tests the flight
+     flag, and the flight levels' overlay touches the HUD only to update the
+     gem count. Retail also skips `EnqueueLoadingScreenSprites` in flight
+     levels, so the usual composer is not involved. Finding the drawer is
+     step one and nothing can be estimated before it.
+  2. *There is no space.* LOADER 8 free, BIOS2 16, BIOS2B 4 — 28 bytes in
+     total, against roughly 150 for a relayout. The RAM survey concluded
+     BIOS scratch is fully mapped, so this needs a structural change, and
+     it is a large part of the argument for building on the decomp.
+- Cosmetic, and confined to the four flight levels.
 
 ---
 

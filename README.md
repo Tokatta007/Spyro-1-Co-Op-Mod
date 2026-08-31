@@ -2,14 +2,15 @@
 
 Split-screen co-op for **Spyro the Dragon** (PlayStation, NTSC).
 
-As it stands: two dragons, two controllers, two cameras, a per-player HUD,
-enemies and pickups assigned to whichever player is nearest, and a Multiplayer
-settings page inside the game's own pause menu. **The goal is up to four
-players in split-screen.**
+As it stands: drop-in drop-out split-screen co-op is fairly functional, with
+only a few minor bugs. This includes a Multiplayer settings page inside the
+game's own pause menu to configure settings. **The goal is up to four players
+in split-screen, and to release this on OpenPete.**
 
 Built by studying and porting the architecture of
-[Spyromain's Spyro2x2](https://github.com/Spyromain/Spyro2x2), an equivalent
-mod for *Ripto's Rage*. MIT licensed, and that attribution is preserved.
+[Spyromain's incredible Spyro2x2 mod](https://github.com/Spyromain/Spyro2x2),
+an equivalent mod for *Ripto's Rage*. MIT licensed, and that attribution is
+preserved.
 
 ---
 
@@ -30,12 +31,7 @@ camera glitch on some hits, and pitch control in the flight levels.
 You supply your own copy of the game. No game data is included in this
 repository.
 
-The mod is distributed as a **patch** you apply to your own disc image — you
-will not need to build anything or touch a compiler.
-
-> **Not released yet.** Patches will appear on the [Releases](../../releases)
-> page. The build pipeline for them exists and is verified; what is left is
-> finishing the open items in [BUGS.md](BUGS.md).
+The mod is distributed as a **patch** you apply to your own disc image.
 
 You will need:
 
@@ -45,27 +41,23 @@ You will need:
   [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher).
 - An emulator or real hardware. **DuckStation** is what this is tested on.
 - Two controllers. A CPU overclock of around 300% helps the framerate in busy
-  scenes; do not go above it.
+  scenes; do not go above it or it could result in crashes.
 
 Apply the `.xdelta` to your `.bin`, keep the supplied `.cue` beside the
 result, and open the `.cue` in your emulator.
-
-The patch is around 13 KB. That is the whole mod — it contains none of the
-game, only the difference between your disc and the modded one, which is why
-it can be shared when the game itself cannot.
 
 ## How it works
 
 The retail executable is reassembled byte-for-byte, with **24 individual
 instructions** replaced by jumps into new code. That code lives in PlayStation
-BIOS scratch RAM below the game — about 11 KB across three regions — because
+BIOS scratch RAM below the game (about 11 KB across three regions), because
 the game's own address space is full end to end. It gets there by enlarging
 the executable's declared size so the BIOS loads an extra payload, which a
 boot stub copies into place before the game starts.
 
 Player 2 exists by running the game's own logic twice per frame with a second
-set of state swapped in — Spyro's tick, the camera update, the moby pass and
-the scene build — rather than by teaching the engine about a second character.
+set of state swapped in: Spyro's tick, the camera update, the moby pass and
+the scene build. The engine is never taught about a second character.
 
 [CHANGES.md](CHANGES.md) documents every hook, the memory map, and the
 per-player state.
@@ -87,7 +79,8 @@ each of which has its own upstream repository.
 
 ## Building from source
 
-Only needed if you want to modify the mod — players should use the patch.
+Building from scratch is only needed if you want to modify the mod. Most
+players should use the patch.
 
 Requires a `mipsel-none-elf` GCC cross-compiler (the PlayStation runs a MIPS
 processor, so the code has to be built by a compiler that targets it rather
@@ -113,6 +106,13 @@ already downloaded it.
 Every build verifies itself: that only the intended instructions changed, that
 each hook reaches the function it names, that no memory allocations overlap,
 and that every hook is documented. See section 6 of [CHANGES.md](CHANGES.md).
+
+## Contributing
+
+I am an amateur coder working on this in my own time, and I would genuinely
+welcome help. If any of this interests you, please reach out or open a pull
+request. Bug reports and play-testing are just as useful as code, and
+[BUGS.md](BUGS.md) is an honest list of what is still wrong.
 
 ## Credits
 
