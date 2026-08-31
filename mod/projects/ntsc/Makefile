@@ -21,7 +21,7 @@ MAINOBJ = build/src/asm/header.o \
 	build/src/asm/main.o \
 	build/src/c/Sp1x2Graphics.o \
 	build/src/c/Sp1x2Pad.o \
-	build/src/c/Sp1x2Boot.o \
+	build/src/c/Sp1x2Boot.o build/src/c/Sp1x2Ground.o \
 	build/src/c/Sp1x2Spyro.o build/src/c/Sp1x2Sparx.o \
 	build/src/c/Sp1x2Gates.o \
 	build/src/c/Sp1x2Menu.o

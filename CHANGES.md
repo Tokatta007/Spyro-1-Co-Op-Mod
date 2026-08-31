@@ -92,11 +92,11 @@ Confidence: **OK** confirmed · **OK\*** works, known limits · **?** unproven �
 
 | Range | Size | Contents | Used |
 | --- | --- | --- | --- |
-| `0x8000B070`–`0x8000B86F` | `0x800` | **LOADER.** EXE header + boot stub, pad/input, region + moby-flag + particle sync, portal draw, sound distance. Free via the BIOS. | 2008 / 2048 (**40 free**) |
+| `0x8000B070`–`0x8000B86F` | `0x800` | **LOADER.** EXE header + boot stub, pad/input, region + moby-flag + particle sync, portal draw, sound distance, respawn grounding. Free via the BIOS. | 2044 / 2048 (**4 free**) |
 | `0x8000B870`–`0x8000BFFF` | — | **DO NOT USE.** BIOS `EXEC` struct. LOADER's length stops the linker here. | — |
-| `0x8000C000`–`0x8000DFFF` | `0x2000` | **BIOS2.** Render hook, viewport/squash, HUD shift, flame chains, P2 Spyro/camera/moby machinery, death handler, pause menu. | ends `0x8000E000` (**full**) |
+| `0x8000C000`–`0x8000DFFF` | `0x2000` | **BIOS2.** Render hook, viewport/squash, HUD shift, flame chains, P2 Spyro/camera/moby machinery, death handler, pause menu. | 8176 / 8192 (**16 free**) |
 | `0x8000E000`–`0x8000E3FF` | `0x400` | **DO NOT USE.** BIOS kernel event/thread tables. Copying code here black-screens the game. | — |
-| `0x8000E400`–`0x8000E7FF` | `0x400` | **BIOS2B.** Sparx lifecycle, menu chime, main-menu-item wrapper, both collision gates, `Sp1x2FixFocus`. | ends `0x8000E6F8` (**264 free**) |
+| `0x8000E400`–`0x8000E7FF` | `0x400` | **BIOS2B.** Sparx lifecycle, menu chime, main-menu-item wrapper, both collision gates, `Sp1x2FixFocus`. | 1020 / 1024 (**4 free**) |
 | `0x8000E800`–`0x8000FFFF` | `0x1800` | **BIOS3.** Runtime data only, never code. No delivery needed. | fully allocated |
 | `0x80010000`–`0x800757FF` | `0x65800` | The game, reassembled with 24 patched instructions. | exact |
 
@@ -358,6 +358,44 @@ downloaded it. It also prints the source disc's SHA-1, so the release notes
 can state exactly which copy of the game the patch expects.
 
 Requires `xdelta3` (`brew install xdelta` on macOS).
+
+## 5g. Fixed 2026-08-30 — respawn lands on the ground
+
+**Reported:** respawning in a level dropped the dragon into the air, and he
+fell to the floor. Retail never shows this, because retail never respawns
+anyone in place — a death reloads the level and plays the entrance animation,
+where Spyro flies in and lands under the sequence's control. Our individual
+respawn skips the reload, which is the entire point of it, so whatever height
+we write is simply where he appears.
+
+A mismatch was expected rather than exceptional: none of the three spawn
+sources promises to sit on the floor. `g_Checkpoint.m_StartingPosition` is
+consumed by retail during a reload that re-grounds him anyway, and the cached
+true start and captured arrival are both sampled on the first gameplay frame
+of a level, when the entrance animation has only just handed back control.
+
+**Fix:** ask the game where the floor is, using its own answer to exactly this
+question — `func_8004D5EC`, declared in the decompilation's `collision.h` as
+"looks for the floor below the specified position", and used by
+`loaders.c:709` to place every moby in a level. `Sp1x2Ground` follows retail's
+idiom from `moby_helpers.c:184-187`: lift the position slightly, probe, put it
+back. Lifting first also fixes the opposite error, a spawn point buried just
+under the ground.
+
+The result is accepted only if it lands inside the span actually searched;
+anything else keeps the stored height, so a failed probe or a sentinel leaves
+the previous behaviour rather than dropping a dragon into the void.
+
+**Where it lives.** `Sp1x2Ground.c` exists as its own file purely for
+placement: code is assigned to a region per object file, BIOS2 was full to the
+byte, and LOADER had room. It takes the teleport detector's three position
+stores with it, which pays for the call — BIOS2 came out of the change with 16
+free bytes where it had none. Both regions are now within a few bytes of full,
+which is why that file carries two values across the call rather than three
+and uses one unsigned window test rather than two signed comparisons. Neither
+is a shortcut around a safety check.
+
+No new hook: this rides the existing death handler on hooks 17 and 18.
 
 ## 6. Build verification — what `make` checks every time
 

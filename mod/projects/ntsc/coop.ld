@@ -61,6 +61,9 @@ SECTIONS
         build/src/asm/header.o(.text .text.*)
         build/src/c/Sp1x2Boot.o(.text .text.*)
         build/src/c/Sp1x2Pad.o(.text .text.*)
+        /* Grounds a respawn. Here, not in BIOS2 beside its only caller,
+           purely because BIOS2 is full — see Sp1x2Ground.c. */
+        build/src/c/Sp1x2Ground.o(.text .text.*)
         build/src/c/Sp1x2Pad.o(.rodata*)
     } > LOADER
 

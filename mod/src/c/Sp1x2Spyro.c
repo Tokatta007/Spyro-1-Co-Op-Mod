@@ -1403,18 +1403,27 @@ void Sp1x2Die(void)
                        ? cache + 1
                        : (volatile int *)0x8000ED20;
     }
+    /* Put him down STANDING, not falling (2026-08-30). This writes the
+       position, grounds it against the game's own floor probe, and carries
+       the teleport detector's sample along with it. See Sp1x2Ground.c for
+       why a respawn needs grounding at all and why it lives in another file.
+
+       It perturbs the collision globals as a side effect of probing, which is
+       harmless here: we are teleporting the dragon regardless, and
+       ResetSpyroState below clears m_CollisionTriangleIndex to -1 — the
+       game's own "he no longer knows what he is standing on".
+
+       The teleport detector's sample is written in the same pass. It reads a
+       live-Spyro jump over 0x4000 in one frame as a level restart and reseeds
+       player 2 onto player 1 — which is why player 1 respawning used to drag
+       player 2 to the checkpoint. It samples the LIVE Spyro, and whoever is
+       dying here is live, so it matters for either player. The grounding
+       below can still move him by up to 4096, a quarter of that threshold,
+       so re-sampling afterwards would buy nothing. */
     for (i = 0; i < 3; i++) {
         ((volatile int *)spyro)[i] = checkpoint_pos[i];
     }
-
-    /* Move the TELEPORT DETECTOR's previous-position sample with him. It reads
-       any live-Spyro jump over 0x4000 in one frame as a level restart and
-       reseeds player 2 onto player 1 — which is why player 1 respawning also
-       dragged player 2 to the checkpoint. The detector samples the LIVE
-       Spyro, and whoever is dying here is live, so update it either way. */
-    for (i = 0; i < 3; i++) {
-        ((volatile int *)0x8000F1C0)[i] = checkpoint_pos[i];
-    }
+    Sp1x2Ground((volatile int *)spyro);
 
     /* Arm the fairy mute AT THE RESPAWN POINT — see Sp1x2FairyMute. It must
        be armed HERE, not earlier: the first attempt stored g_anSpyroWorldPos

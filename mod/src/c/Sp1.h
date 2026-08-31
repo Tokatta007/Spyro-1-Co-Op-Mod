@@ -162,7 +162,13 @@ extern int g_nMotionTrailRibbonCount;
 
 extern void TriggerRespawnOrGameOver(void);
 extern void ResetSpyroState(int keepPosition);
+extern int  FindFloorBelow(volatile int *pos, int max);
 extern int  g_SpyroLifeCount;
+
+/* Returns the height a dragon respawning at height z should stand at, so he
+   lands on the floor instead of dropping onto it. Lives in LOADER rather than
+   BIOS2 beside its caller, which is full — see Sp1x2Ground.c. */
+extern void Sp1x2Ground(volatile int *spyro);
 
 /* Hooked over BOTH `jal TriggerRespawnOrGameOver` sites, so one player dying
    no longer restarts the level for everybody. */

@@ -90,6 +90,13 @@ TriggerRespawnOrGameOver  = 0x8002c85c;   /* spyro-1 func_8002C85C, commented
      and sets GS_Respawn, else GS_GameOver. TWO call sites, both inside Spyro's
      own tick (func_80041670 at 0x80042f10, func_8004A200 at 0x8004a4d8), so
      whichever player is ticking is the one dying. */
+FindFloorBelow            = 0x8004d5ec;   /* spyro-1 func_8004D5EC(pos, max),
+     documented in collision.h as "looks for the floor below the specified
+     position ... returns the floor position". The game's own way of putting
+     something on the ground: loaders.c:709 probes from z+1024 when placing
+     every level moby, and moby_helpers.c:194 then assigns
+     z = floorZ + m_FloorDistance. It also writes the collision globals as a
+     side effect, which is why retail follows it with a shadow update. */
 ResetSpyroState           = 0x8004ac24;   /* spyro-1 func_8004AC24(keepPos).
      With 1 it backs up position, body rotation and health, MEMSETS the whole
      Spyro struct, restores those three and returns him to state 0 — the

@@ -120,6 +120,21 @@ release readme, not in a bug tracker.
 
 ## 4. Recently fixed — needs confirmation
 
+**C0 — Respawn drops the dragon out of the air.** *Untested.*
+
+- Reported 2026-08-30: respawning inside a level put Spyro in the air and he
+  fell to the ground, where the level's own entrance has him land properly.
+- Fixed by asking the game where the floor is — its own `func_8004D5EC`,
+  which retail uses to place every moby in a level — and standing him on it.
+- **Watch for:** the respawn point being right, not just grounded. If a
+  respawn ever puts him *through* the floor or on a ledge he should not be
+  on, the probe found the wrong surface and the accept-window in
+  `Sp1x2Ground.c` is the knob. Nothing outside the respawn is affected.
+- Applies to individual respawns only. Solo play and game over still take
+  the stock path, which reloads the level as always.
+
+---
+
 **C1 — Interrupt-deadlock fix (deferred pad poll).** *Untested — test this first.*
 
 - Spyro's tick and the camera update no longer run with interrupts disabled.
