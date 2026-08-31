@@ -26,17 +26,24 @@ Genuinely broken, nobody has decided to live with it. Worst first.
   main HUD had before `Sp1x2HudShift`.
 - **Wanted:** the same treatment as the gems / dragons / lives HUD, which is
   shifted per viewport and, for the side-by-side split, relaid out per moby.
-- **BLOCKED ON TWO THINGS, in order:**
-  1. *Nobody has found what draws it.* It is **not** `hud.c`, which only
-     handles gems, dragons and lives. The draw path never tests the flight
-     flag, and the flight levels' overlay touches the HUD only to update the
-     gem count. Retail also skips `EnqueueLoadingScreenSprites` in flight
-     levels, so the usual composer is not involved. Finding the drawer is
-     step one and nothing can be estimated before it.
-  2. *There is no space.* LOADER 8 free, BIOS2 16, BIOS2B 4 — 28 bytes in
-     total, against roughly 150 for a relayout. The RAM survey concluded
-     BIOS scratch is fully mapped, so this needs a structural change, and
-     it is a large part of the argument for building on the decomp.
+- **FOUND 2026-08-31: it is drawn by the LEVEL OVERLAY, not by the game's
+  own HUD code.** `include/overlays/flight.inc.h`, the source shared by every
+  flight level, function `Flight5`. That is why it was never found in
+  `hud.c` and why `Sp1x2HudShift` does not touch it.
+- It writes **absolute full-screen coordinates** — `x = 460`, `x = 100`,
+  `x = 320` on a 512-wide screen — through `func_80017FE4` (the same text
+  builder our pause menu uses) and direct `g_HudMobys` writes. It even calls
+  `PutDrawEnv` itself. Fixed 512-wide coordinates explain both symptoms
+  exactly: `x = 460` is far outside a 256-wide vertical viewport, and the
+  rows overhang a 112-line horizontal one.
+- **THIS IS WHY IT CANNOT BE FIXED TODAY, and space is not the reason.**
+  Our architecture patches the executable and *does not patch overlays* at
+  all. There is no hook to place. Even with bytes to spare, the code that
+  needs changing is not code we can reach.
+- **With the decompilation it becomes ordinary work**, because overlays are
+  built from source there — `make` produces all 37 of them. This is the
+  clearest single argument for that pivot: it turns an impossible item into
+  a normal one.
 - Cosmetic, and confined to the four flight levels.
 
 ---
