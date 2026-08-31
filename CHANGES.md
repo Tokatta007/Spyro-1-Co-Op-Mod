@@ -376,15 +376,34 @@ of a level, when the entrance animation has only just handed back control.
 
 **Fix:** ask the game where the floor is, using its own answer to exactly this
 question — `func_8004D5EC`, declared in the decompilation's `collision.h` as
-"looks for the floor below the specified position", and used by
-`loaders.c:709` to place every moby in a level. `Sp1x2Ground` follows retail's
-idiom from `moby_helpers.c:184-187`: lift the position slightly, probe, put it
-back. Lifting first also fixes the opposite error, a spawn point buried just
-under the ground.
+"looks for the floor below the specified position" — and stand him on it.
+
+**Two constants make or break this, and the first attempt got both wrong.**
+
+*How far Spyro's origin sits above the floor: 356.* Not a guess —
+`checkpoint.c:21` adds exactly this to the checkpoint moby's position when
+saving a checkpoint, commented *"move the starting position up a bit to
+accommodate for Spyro's hitsphere"*. His own tick agrees: `pete.c` treats him
+as grounded while `m_Position.z - m_surfaceBelowSpyro` is within 512.
+Omitting it placed him at floor level — 356 units *inside* the ground — and
+the collision ejected him upward, reported as being bounced up off the pad.
+
+*How far down to search: `0x10000`.* This is the reach Spyro's own code uses
+(`pete.c:1487`). The first attempt used 4096, the figure retail uses for
+**mobys**, which was far too short: a spawn point captured while he was still
+descending from a level's fly-in sits thousands of units up, the probe found
+nothing, and the respawn was left exactly as broken as before.
 
 The result is accepted only if it lands inside the span actually searched;
 anything else keeps the stored height, so a failed probe or a sentinel leaves
-the previous behaviour rather than dropping a dragon into the void.
+the previous behaviour rather than dropping a dragon into the void. A floor
+found *above* him goes negative and fails the same unsigned test.
+
+**Related, not fixed:** the arrival capture is taken on the first gameplay
+frame of a level, which can be before he has finished descending from the
+fly-in. Grounding the respawn corrects the symptom wherever the stored height
+came from; capturing the position only once `m_airTime` is zero would fix it
+at source, and is the better change if space ever allows.
 
 **Where it lives.** `Sp1x2Ground.c` exists as its own file purely for
 placement: code is assigned to a region per object file, BIOS2 was full to the

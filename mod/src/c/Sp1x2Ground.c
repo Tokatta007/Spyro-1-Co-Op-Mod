@@ -44,52 +44,49 @@
 
 #include "Sp1.h"
 
-/* Probe from slightly above the stored point, the way loaders.c:709 does. It
-   costs nothing and covers the opposite error too: a spawn point a little
-   BELOW the floor probes back up to it, instead of leaving him buried. */
-#define SP1X2_PROBE_RISE   1024
+/* How far down to look. Spyro's OWN code probes the floor beneath him with
+   exactly this reach (pete.c:1487), so it is the figure the game itself
+   considers adequate for him. The first version of this fix used 4096, the
+   value used for MOBYS, and it was far too short: a spawn point captured
+   while he was still descending from a level's fly-in can sit thousands of
+   units up, the probe found nothing, and the respawn was left exactly as
+   broken as before. */
+#define SP1X2_PROBE_REACH  0x10000
 
-/* How far down a floor is accepted. The game uses 4096 for mobys, and that is
-   the right order here: this corrects a spawn point that is off by a body
-   length or two, not one suspended over a canyon. If the stored point really
-   is high above open ground, the drop is the honest behaviour and we leave it
-   alone. Spyro's own body radius is 0x1A0 for scale. */
-#define SP1X2_PROBE_REACH  4096
+/* How far Spyro's origin sits ABOVE the floor when he is standing on it.
+   Not a guess: checkpoint.c:21 adds precisely this to the checkpoint moby's
+   position when saving a checkpoint, commented "move the starting position up
+   a bit to accommodate for Spyro's hitsphere". His own tick agrees — pete.c
+   treats him as grounded while m_Position.z - m_surfaceBelowSpyro is within
+   512, and special_surfaces.c uses 400.
 
-/* Settles a dragon already standing at his spawn point onto the floor.
-   Takes only the position and reads the height out of it, so the call site in
-   BIOS2 is a register move and a jump and nothing else — that region is full
-   to the byte, and every argument would have to be paid for there.
+   Omitting this is what made the first attempt worse rather than better. It
+   put him at floor level, which is 356 units INSIDE the ground, and the
+   collision promptly ejected him — reported as being bounced up and landing
+   off the pad. */
+#define SP1X2_STAND_HEIGHT 356
 
-   The dragon's OWN position is the probe: lifting it, asking, and putting it
-   back is how retail grounds a moby (moby_helpers.c:184-187), and it avoids a
-   stack copy. */
 void Sp1x2Ground(volatile int *spyro)
 {
     volatile int *seen = (volatile int *)0x8000F1C0;
     int z = spyro[2];
     int floor;
 
-    /* Lift, ask, put back. */
-    spyro[2] = z + SP1X2_PROBE_RISE;
+    /* Ask from where he already stands, as pete.c:1487 does, rather than
+       lifting him first. Lifting is retail's idiom for MOBYS, whose origins
+       sit at floor level; Spyro's does not, so there is nothing to lift him
+       out of and a lift only risks catching a surface above him. */
     floor = FindFloorBelow(spyro, SP1X2_PROBE_REACH);
 
-    /* Accept the answer only if it lies inside the span actually searched:
-       from SP1X2_PROBE_RISE above the spawn height (a point buried just under
-       the ground) down to SP1X2_PROBE_REACH below the probe. Every genuine
-       result falls in that window by construction, so anything outside it is
-       a failed probe or a sentinel, and we keep the stored height — the
-       behaviour we had before this function existed. A spawn a little too
-       high is a blemish; one that drops a dragon into the void on a bad
-       reading is a lost run.
-
-       The window is one UNSIGNED comparison rather than a pair of signed
-       ones, and is measured from the spawn height rather than the lifted
-       probe so the compiler need only carry two values across the call
-       above. Both matter in a region with no free bytes at all. */
-    if ((unsigned int)(z - floor + SP1X2_PROBE_RISE)
-            <= (unsigned int)SP1X2_PROBE_REACH) {
-        z = floor;
+    /* Accept the answer only if it lies inside the span actually searched.
+       Every genuine result does by construction, so anything outside is a
+       failed probe or a sentinel, and we keep the stored height — the
+       behaviour we had before this function existed. A floor ABOVE him goes
+       negative and, read as unsigned, fails the same test. A spawn a little
+       too high is a blemish; one that drops a dragon into the void on a bad
+       reading is a lost run. */
+    if ((unsigned int)(z - floor) <= (unsigned int)SP1X2_PROBE_REACH) {
+        z = floor + SP1X2_STAND_HEIGHT;
     }
 
     spyro[2] = z;

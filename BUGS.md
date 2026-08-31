@@ -124,8 +124,14 @@ release readme, not in a bug tracker.
 
 - Reported 2026-08-30: respawning inside a level put Spyro in the air and he
   fell to the ground, where the level's own entrance has him land properly.
-- Fixed by asking the game where the floor is — its own `func_8004D5EC`,
-  which retail uses to place every moby in a level — and standing him on it.
+- Fixed by asking the game where the floor is — its own `func_8004D5EC` —
+  and standing him 356 units above it, the height `checkpoint.c:21` uses
+  "to accommodate for Spyro's hitsphere".
+- **First attempt failed and is worth remembering.** It used the floor height
+  directly, burying him 356 units, and searched only 4096 — retail's reach
+  for *mobys*, not for Spyro, whose own code searches `0x10000`. The result
+  was a bounce out of the ground in the homeworld and no change at all in
+  levels. Both symptoms came from those two constants.
 - **Watch for:** the respawn point being right, not just grounded. If a
   respawn ever puts him *through* the floor or on a ledge he should not be
   on, the probe found the wrong surface and the accept-window in
