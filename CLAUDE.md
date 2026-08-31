@@ -47,6 +47,63 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## THE DECOMP BUILDS, AND IT MATCHES — 2026-08-31, ON THIS MACHINE
+
+`reference/spyro-1` was built from source and **all 38 targets match**: PSX.EXE
+plus every one of the 37 level overlays, verified by the project's own
+`sha256sum.txt`. Decisively:
+    build/PSX.EXE  84e3728ab94720d0873e2514adf4aade4935e0c5
+    SCUS_942.28    84e3728ab94720d0873e2514adf4aade4935e0c5   (our retail ROM)
+**Identical.** So the decompilation reproduces OUR game exactly, and it is a
+sound base to build the mod on. This was the MATCHING build (GCC 2.7.2 +
+maspsx), NOT MODERN_COMPILER — so the strong gate, not the weak one.
+
+**HOW TO REPRODUCE IT. Four steps, and three of them are not in their README:**
+  1. **PSYQ headers** — the repo ships `psyq/` EMPTY. Get
+     `http://psx.arthus.net/sdk/Psy-Q/psyq-4.7-converted-full.7z` (1.5 MB, the
+     archive every PS1 decomp points at) and copy its `include/` and `lib/`
+     into `reference/spyro-1/psyq/`. Needs `brew install sevenzip` (`7zz x`).
+     PSYQ headers are the SDK's compile-time `.h` files and have NOTHING to do
+     with `Roms/BIOS/SCPH1001.BIN`, which is the console's runtime firmware —
+     an easy and natural confusion.
+  2. **`git submodule update --init`** — `tools/maspsx` was empty in our clone,
+     and the matching build cannot run without it.
+  3. **`docker build --platform linux/amd64`** — NOT the bare command in their
+     `docker_env.sh`. The matching compiler `tools/gcc2.7.2/cc1` is a 32-bit
+     x86 Linux binary; on Apple Silicon an arm64 image cannot run it. Under an
+     amd64 image it works (verified: it rejects `--version`, which postdates
+     it, but compiles).
+  4. `docker run --rm --platform linux/amd64 -v "$(pwd)":/s1 s1_dev_env \
+      bash -c 'make -j4 all'` — about 20 seconds of image build, then quick.
+
+**WHAT THE BUILD DOES AND DOES NOT PRODUCE:** `build/PSX.EXE` and
+`build/wad/*.ovl`. It does NOT build a disc — our own mkpsxiso pipeline still
+does that, and slots straight in.
+**WHY MATCHING RATHER THAN MODERN_COMPILER, corrected 2026-08-31.** The
+original plan was to chase MODERN_COMPILER for its smaller code. That was
+aiming at the wrong thing. What the mod actually needs is to LINK BY SYMBOL
+AND LET THE BINARY GROW, which the matching build already permits — matching
+is a check that the base is faithful, and our additions simply make it bigger
+and stop matching, which is expected. MODERN_COMPILER additionally gives up
+the 38-file gate and lets every upstream sync shift code, on a binary that is
+still ~60% hand assembly. Note their MODERN_COMPILER path uses `-Os -G 0`,
+the same small-data setting our own mod already builds with, so it remains
+available later at no conversion cost.
+**AND THE USER WAS RIGHT ABOUT UPSTREAM CHURN, where I was not.** I warned
+that the decomp's progress would shift addresses under us. It does not: in a
+matching build a newly decompiled function compiles to identical bytes BY
+DEFINITION, so the output never moves. Their README's warning is about SOURCE
+churn — renames and restructuring — which is ordinary merge work.
+**HARDWARE, since it came up:** none of this affects console compatibility.
+The PS1 has 2 MB of RAM whether emulated or real. Building from source does
+not grant more; it lets our code sit in the normal layout instead of squatting
+in BIOS scratch — which is in fact SAFER on hardware, because the scratch
+region was only ever verified against SCPH1001 and other BIOS revisions lay it
+out differently. The real console barrier is SPEED: we draw the scene twice,
+the 300% overclock is an emulator feature, and the four-viewport probe
+measured exactly half framerate. **Four-player split is an OpenPete goal, not
+a PS1 one.**
+
 ## A1 CLOSED 2026-08-30 — ENEMIES NEAR PLAYER 2 BEHAVE NORMALLY
 
 User, after a full session: the rams now "attack, then return to position and
