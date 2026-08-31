@@ -47,6 +47,44 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## RESPAWN GROUNDING CONFIRMED 2026-08-30 (user: "respawn works... complete")
+
+A respawned dragon now stands where he lands, including on a dragon platform.
+**TWO ATTEMPTS, and the first failed on TWO CONSTANTS — both of which the
+game's own source states outright, and neither of which I read before
+building.**
+  1. **Spyro's origin sits 356 UNITS ABOVE THE FLOOR, not on it.**
+     checkpoint.c:21 adds exactly that when saving a checkpoint, commented
+     "move the starting position up a bit to accommodate for Spyro's
+     hitsphere"; pete.c calls him grounded while
+     m_Position.z - m_surfaceBelowSpyro is within 512. Placing him AT floor
+     level buried him and the collision ejected him — the user saw a bounce
+     up and off the homeworld pad.
+  2. **The search reach must be 0x10000, Spyro's own figure (pete.c:1487).**
+     I used 4096, which is retail's reach for MOBYS. A spawn point captured
+     while he was still descending from a level's fly-in sits far beyond
+     that, so the probe found nothing and levels were left untouched.
+**THE LESSON, and it is a sharp one: a helper's DOC COMMENT describes the
+helper, never the CALLER'S CONTRACT.** collision.h says func_8004D5EC "looks
+for the floor below the specified position", which is true and was not
+enough. Everything I got wrong was in how the game calls it FOR SPYRO
+SPECIFICALLY — a different reach and a standing offset — and both were one
+grep away in pete.c and checkpoint.c. **Before using a game function, read a
+call site that uses it on the SAME ACTOR you are aiming at.** Reading
+moby_helpers.c and copying the moby idiom is precisely what produced two
+wrong constants.
+Diagnostic value worth noting: the two symptoms were ASYMMETRIC (homeworld
+bounced, levels unchanged) and each constant explained exactly one of them.
+An asymmetric pair of symptoms usually means TWO faults, not one.
+STILL OPEN AT SOURCE, logged in CHANGES.md 5g: the arrival capture is taken
+on the first gameplay frame, which can be before the fly-in has landed him,
+so the stored height is sometimes airborne. Grounding fixes the symptom from
+whatever source; gating the capture on m_airTime == 0 would fix the cause.
+**SPACE IS NOW THE BINDING CONSTRAINT: LOADER 8 free, BIOS2 16, BIOS2B 4.**
+Sp1x2Ground.c exists as its own file ONLY because code is placed per object
+file and LOADER had the room BIOS2 did not. The next feature — the per-player
+colour menu — needs space FOUND, not shaved.
+
 ## DEADLOCK FIX CONFIRMED 2026-08-30 (user: no freeze, controls fine)
 
 The deferred pad poll works. Interrupts stay enabled, the hard freeze is gone,

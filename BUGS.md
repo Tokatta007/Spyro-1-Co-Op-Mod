@@ -120,39 +120,6 @@ release readme, not in a bug tracker.
 
 ## 4. Recently fixed — needs confirmation
 
-**C0 — Respawn drops the dragon out of the air.** *Untested.*
-
-- Reported 2026-08-30: respawning inside a level put Spyro in the air and he
-  fell to the ground, where the level's own entrance has him land properly.
-- Fixed by asking the game where the floor is — its own `func_8004D5EC` —
-  and standing him 356 units above it, the height `checkpoint.c:21` uses
-  "to accommodate for Spyro's hitsphere".
-- **First attempt failed and is worth remembering.** It used the floor height
-  directly, burying him 356 units, and searched only 4096 — retail's reach
-  for *mobys*, not for Spyro, whose own code searches `0x10000`. The result
-  was a bounce out of the ground in the homeworld and no change at all in
-  levels. Both symptoms came from those two constants.
-- **Watch for:** the respawn point being right, not just grounded. If a
-  respawn ever puts him *through* the floor or on a ledge he should not be
-  on, the probe found the wrong surface and the accept-window in
-  `Sp1x2Ground.c` is the knob. Nothing outside the respawn is affected.
-- Applies to individual respawns only. Solo play and game over still take
-  the stock path, which reloads the level as always.
-
----
-
-**C1 — Interrupt-deadlock fix (deferred pad poll).** *Untested — test this first.*
-
-- Spyro's tick and the camera update no longer run with interrupts disabled.
-  The pad callback is held off by a flag and its poll deferred, instead.
-- **Watch for:** input problems for either player — sluggish, dropped or
-  crossed controls. That is what this change touches.
-- **And:** whether the hard freeze (old A2) returns. If it does, the CP0 dump
-  says which kind: Cause 8 with the music stopped means this did not take;
-  a bad address with music playing means the older memory-fault family.
-
----
-
 **C2 — `g_PadBackup` swap offset corrected** (`0x16D8` -> `0x26D8`,
 2026-08-28). The wrong address sat inside `g_Models`, so 42 enemy model
 pointers were being zeroed during every one of player 2's passes. May well
