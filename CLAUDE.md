@@ -47,6 +47,26 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## A1 CLOSED 2026-08-30 — ENEMIES NEAR PLAYER 2 BEHAVE NORMALLY
+
+User, after a full session: the rams now "attack, then return to position and
+wait for spyro to get close", which is vanilla. Previously they got stuck
+oscillating between chasing a dragon and walking home. **No fix was aimed at
+this** — it was cured by something already shipped, and BUGS.md had named the
+likely candidate in advance: **the g_PadBackup swap-offset typo (0x16D8 ->
+0x26D8, fixed 2026-08-28), which was zeroing g_Models[216..257] — 42 enemy
+model pointers — during every one of player 2's passes.** Not proven for the
+ram's specific class, but it is the only change that plausibly touches enemy
+behaviour and it predates the improvement.
+**THE PROCESS POINT, and it is the good kind:** the entry said "re-test this
+first, it may have been cured outright, and it has never been re-tested
+against this symptom." That note cost one line to write and saved an
+instrumentation round on the project's oldest open bug. **When a fix might
+incidentally close another item, SAY SO IN THAT ITEM — a stale bug entry is
+as expensive as a missing one.**
+Left open by agreement: if it reappears on a DIFFERENT enemy, it is a real
+bug again. The rams were the hardest case, which is why they were the test.
+
 ## RESPAWN GROUNDING CONFIRMED 2026-08-30 (user: "respawn works... complete")
 
 A respawned dragon now stands where he lands, including on a dragon platform.

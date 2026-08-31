@@ -16,22 +16,8 @@ Last reviewed: 2026-08-30.
 
 Genuinely broken, nobody has decided to live with it. Worst first.
 
-**A1 — Enemies near player 2 behave oddly: wandering aimlessly, running in place.**
-
-- *Re-test this first.* The `g_PadBackup` fix (2026-08-28) may have cured it
-  outright, and it has never been re-tested against this symptom.
-- **Cause, candidate (a):** the moby-ownership split — a moby that hits a player
-  it does not own runs its multi-frame hit reaction in the wrong player's pass.
-  The user's cave test (P2 parked far away) made this and the camera spasm stop
-  together.
-- **Cause, candidate (b):** the `g_PadBackup` swap-offset typo, which zeroed 42
-  model pointers (`g_Models[216..257]`) during every one of P2's passes.
-- **Tried:** owner hysteresis (25%, kept). An ownership freeze / hit latch was
-  built, did not fix the camera spasm, and was removed in the 2026-08-27
-  baseline retreat.
-- **Next step:** re-test after the `g_PadBackup` fix. If it persists, instrument
-  *which* moby runs a hit reaction in the wrong pass before touching camera or
-  ownership code again.
+*Nothing.* The list was cleared on 2026-08-30 when the enemy behaviour near
+player 2 was confirmed normal. Anything new goes here.
 
 ---
 
@@ -120,9 +106,6 @@ release readme, not in a bug tracker.
 
 ## 4. Recently fixed — needs confirmation
 
-**C2 — `g_PadBackup` swap offset corrected** (`0x16D8` -> `0x26D8`,
-2026-08-28). The wrong address sat inside `g_Models`, so 42 enemy model
-pointers were being zeroed during every one of player 2's passes. May well
-have cured A1; nobody has re-tested.
+*Nothing outstanding.*
 
 ---
