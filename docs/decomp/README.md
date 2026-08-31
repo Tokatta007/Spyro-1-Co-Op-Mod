@@ -49,6 +49,23 @@ addresses** (`func_level_0_80082068 = 0x80082068;`, lowest `0x8007AC8C`).
 Move the base and every call to a pinned function lands short. The link
 succeeds and the game breaks at the first level load — a silent failure.
 
+## The pins are small, and the flight levels have none
+
+There are **44 pins across 8 overlays**, all of one shape
+(`name = 0xADDRESS;`), so expressing them relative to the overlay base rather
+than absolutely looks like a mechanical change — and one worth offering
+upstream, since it would let anyone grow the executable.
+
+More immediately useful: the pinned overlays are levels 0, 1, 2, 3, 4, 7, 9
+and 99. **The five flight levels (5, 11, 17, 23, 29) carry no pins at all.**
+So their overlays can be edited and rebuilt freely, provided the overlay BASE
+does not move — which it does not, as long as our own code stays out of
+`.text`. The main executable reaches overlay code through pointers
+(`g_UpdateMoby` is a function pointer, and `overlay_pointers.o` holds the
+entry table), so nothing calls into them at a fixed address.
+
+**That makes the flight-HUD bug fixable without solving the pin problem.**
+
 ## What this means
 
 The decompilation gives us **symbols, direct calls, and the ability to edit

@@ -44,6 +44,11 @@ Genuinely broken, nobody has decided to live with it. Worst first.
   built from source there — `make` produces all 37 of them. This is the
   clearest single argument for that pivot: it turns an impossible item into
   a normal one.
+- **And it is fixable there sooner than expected (2026-08-31).** The
+  decomp pins some undecompiled overlay functions to absolute addresses,
+  which would make editing an overlay risky — but the five flight levels
+  carry **none** of those pins. Their overlays can be rebuilt freely. See
+  `docs/decomp/README.md`.
 - Cosmetic, and confined to the four flight levels.
 
 ---
