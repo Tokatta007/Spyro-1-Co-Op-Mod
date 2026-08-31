@@ -52,9 +52,20 @@ succeeds and the game breaks at the first level load — a silent failure.
 ## The pins are small, and the flight levels have none
 
 There are **44 pins across 8 overlays**, all of one shape
-(`name = 0xADDRESS;`), so expressing them relative to the overlay base rather
-than absolutely looks like a mechanical change — and one worth offering
-upstream, since it would let anyone grow the executable.
+(`name = 0xADDRESS;`).
+
+**THESE ARE NOT A DECOMP BUG, and we should not offer a "fix" upstream.**
+They are ordinary scaffolding. `src/overlay_pointers.c` in the executable
+holds pointers into each level's overlay
+(`g_Buffers.m_CopyBuf = func_level_0_80082068;`), and where that overlay
+function is not yet decompiled its retail address is hardcoded so the rest can
+link. In a matching build nothing moves, so a fixed address is correct and
+costs nothing — it works exactly as intended for the project's own goal. It
+constrains only someone who wants to GROW the binary, which is our aim and not
+theirs, and it dissolves by itself as overlays get decompiled.
+
+If we ever need them relocatable, that is a change we make in our own branch
+for our own reasons.
 
 More immediately useful: the pinned overlays are levels 0, 1, 2, 3, 4, 7, 9
 and 99. **The five flight levels (5, 11, 17, 23, 29) carry no pins at all.**
@@ -83,7 +94,7 @@ Options, none yet tried:
   (`MODERN_COMPILER=1 NEW_PSYQ=1 make non_matching` → 395,264 bytes vs
   417,792). Untested, and it needs PSYQ 4.7's libraries linked in, which are
   not the libraries the game shipped with.
-- **Make the pins relocatable upstream** — define them relative to the
-  overlay base rather than absolutely. This is the real fix, would benefit
-  the decomp generally, and looks scriptable.
+- **Make the pins relocatable in our own branch** — define them relative to
+  the overlay base rather than absolutely. Mechanical, 44 lines. Ours to do
+  for our own reasons; see above for why it is not an upstream matter.
 - **Wait**, since the pins disappear as overlays get decompiled.
