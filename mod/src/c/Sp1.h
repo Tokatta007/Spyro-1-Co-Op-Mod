@@ -293,23 +293,16 @@ extern void Sp1x2SwapPadState(void);
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
-/* Core Spyro state — 408 bytes of position, velocity, animation, body yaw,
-   ground contact and motion. Contains ONE foreign global,
-   g_nLevelReadyFlag at +0x164, which must NOT be swapped. */
-extern unsigned char g_abSpyroCoreState[408];
-
-/* Spyro's world position, XYZ — the first thing in the core state block. */
+/* Spyro's world position, XYZ — the first thing in g_Spyro.
+   NOTE (2026-08-31): a block of declarations here described an OLDER swap
+   design that copied a 408-byte "core state" with a 4-byte hole at +0x164,
+   believing that offset held a foreign global named g_nLevelReadyFlag. It
+   does not: the decompilation shows +0x164 is `m_health`, which is exactly
+   per-player and must be swapped. The live table swaps all 676 bytes of
+   g_Spyro and always did, so nothing was ever wrong in the code — but the
+   declarations asserted the opposite and were unused, which is how a wrong
+   idea survives. Deleted. */
 extern int g_anSpyroWorldPos[3];
-#define SP1_SPYRO_STATE_BASE  0x80078a58
-#define SP1_SPYRO_STATE_SIZE  408
-#define SP1_SPYRO_SKIP_OFFSET 0x164      /* g_nLevelReadyFlag, 4 bytes */
-#define SP1_SPYRO_POS_OFFSET  0          /* g_anSpyroWorldPos is at +0 */
-
-/* Second pure Spyro cluster: flame breath timer + horn-strike state.
-   Separate from block 1, and easy to miss — omitting it makes player 1's
-   flame render again during player 2's draw, pointing the wrong way. */
-#define SP1_SPYRO_BLK2_BASE   0x80078760
-#define SP1_SPYRO_BLK2_SIZE   160
 
 /* Frame submit. */
 extern void DrawSync(int mode);

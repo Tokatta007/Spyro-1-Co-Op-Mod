@@ -257,12 +257,12 @@ DrawSpyroDropShadow    = 0x80059a48;
 DrawSpyroFlames        = 0x80058d64;
 g_nSpyroDrawSuppressed = 0x80075814;
 
-/* Core Spyro state: 408 bytes at 0x80078a58 — position, velocity, animation,
-   body yaw, ground contact, motion vectors. 52 symbols, of which exactly ONE
-   is foreign: g_nLevelReadyFlag at 0x80078bbc. We swap around it in two
-   ranges rather than clobbering a global level flag. */
-g_abSpyroCoreState     = 0x80078a58;
-g_anSpyroWorldPos      = 0x80078a58;   /* same address, XYZ position */
+/* Spyro's world position, XYZ — the first field of g_Spyro (0x2a4 bytes),
+   all of which the swap table copies. An earlier note here claimed 0x80078bbc
+   inside it was a foreign global "g_nLevelReadyFlag" to be swapped around;
+   the decompilation shows it is g_Spyro + 0x164 = m_health, which is
+   per-player and must travel with him. Nothing acted on the claim. */
+g_anSpyroWorldPos      = 0x80078a58;
 
 /* Spyro's per-frame update, called from GamestateUpdate. Running this a
    second time with player 2's Spyro state AND input swapped in is what makes
@@ -276,7 +276,6 @@ TickSpyroGameplayFrame = 0x8004a200;
    these in Sp2x2LogicController. */
 EnterCriticalSection   = 0x8005dba4;
 ExitCriticalSection    = 0x8005dbb4;
-g_nLevelReadyFlag      = 0x80078bbc;
 
 /* ---- input ----
    InitPadSystem (0x800123c8) hands the BIOS these two buffers and polls BOTH
