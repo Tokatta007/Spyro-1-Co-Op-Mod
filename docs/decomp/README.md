@@ -197,3 +197,49 @@ Changed one constant (`initialization.c`, starting lives 4 -> 9) and rebuilt.
 
 So the chain source -> executable -> disc is sound, and our v0.1 disc is the
 control that proves the metadata difference is harmless.
+
+## The port — complete, 2026-08-31
+
+All 3,630 lines of the mod build inside the decompilation, all 24 hooks are
+wired, and the disc packs with retail's LBAs intact (`WAD.WAD` 37,
+`SCUS_942.28` 53875, `PETEXA0.STR` 60000). The executable is 430,080 bytes,
+six sectors larger than retail, absorbed by the dummy padding.
+
+### What the hooks became
+
+Most are now ordinary calls in decompiled C: the render entry in `main.c`,
+four inside `GamestateUpdate`, the portal draw, the pause menu's six rows and
+its two box tests, the sound distance, the pad-callback install. Three stay in
+assembly because their callers are — the two death sites in `pete`, and the
+sparkle ageing in `r_particles`. The retail Baruti crash is fixed where it
+lives, in `math.s`.
+
+Two techniques retire completely: the **boot stub and payload arithmetic**, and
+the **entry patches** on the collision guards, which were the most delicate
+thing in the mod.
+
+### THE TRAP THAT WOULD HAVE BROKEN IT SILENTLY
+
+The mod carried its per-player swap tables as **16-bit offsets from
+0x80075000**, packed that way to save bytes, plus about 35 other raw
+addresses. Adding our code lengthens the executable, so the game's `.data` and
+`.bss` no longer sit where they did — **and they do not shift by the same
+amount as each other**, because our text, rodata and data each push the
+sections after them. There is no uniform correction. An offset table would
+have swapped the wrong memory, symmetrically, with nothing crashing: exactly
+the shape of the `g_PadBackup` bug that survived months.
+
+Every address is now a real symbol and the tables hold pointers. Two of the
+conversions confirmed old findings independently: `0x80075760` resolves to
+**`g_UnprocessedFrames`**, not the frame counter open-spyro named it, and the
+`g_PadBackup` entry corrected in August lands exactly on `g_PadBackup`.
+
+### Build-system fixes made along the way
+
+- **`pipefail`**. Every compile is a pipeline and make only sees the last
+  command, so a compiler error was silently swallowed: `as` succeeded on empty
+  input and produced ~800-byte objects. Our files "compiled" while producing
+  nothing.
+- **`src/coop/` uses the modern compiler at `-G0`**, as the standalone mod
+  does. The matching compiler is GCC 2.7.2, which is C89 and rejects
+  declarations after statements.
