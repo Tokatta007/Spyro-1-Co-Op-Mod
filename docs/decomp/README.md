@@ -24,7 +24,34 @@ Setup, of which only step 4 is in their README:
 4. `docker run --rm --platform linux/amd64 -v "$(pwd)":/s1 s1_dev_env \
     bash -c 'make -j4 all'`
 
-## THE BLOCKER: adding code to the executable moves the overlays
+## THE BLOCKER — SOLVED AND USER-TESTED 2026-08-31
+
+The pins below are now expressed relative to the overlay base, and a disc
+built that way **played three levels with no crashes, glitches or visible
+change**. The executable can grow.
+
+`overlays.ld` pinned 44 undecompiled overlay functions to absolute retail
+addresses. The game itself does not need that: `overlay_pointers.c` sets
+`g_OverlaySpacePointer = &main_BSS_END`, a linker symbol, so overlays follow
+when the executable grows. Only the pins did not.
+
+Rewriting each as `main_BSS_END + <offset from retail's 0x8007AA38>`:
+
+- **byte-neutral when nothing moves** — 38 of 38 still match;
+- **tracks correctly when it does** — with code added, a pin that was
+  `0x80082068` resolved to `0x800820A8`, exactly the `0x40` the base shifted.
+
+**But rebuilt overlays must then be injected into `WAD.WAD`**, or the game
+loads retail overlays built for the old base to the new address and each level
+breaks as you enter it. `mod/scripts/overlay_map.py` records where each
+overlay sits (run against a matching build, since a rebuilt one matches
+nothing on the disc); `mod/scripts/inject_overlays.py` writes them back and
+refuses any that outgrow their slot. Offsets are kept in
+`docs/decomp/overlay_offsets.json`.
+
+Original diagnosis follows.
+
+## THE ORIGINAL BLOCKER: adding code to the executable moves the overlays
 
 `add-our-code.patch` and `coop.c` are the experiment. They add one small
 function, place its object last in `.text` so no game code moves, and call it
