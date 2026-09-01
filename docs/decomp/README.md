@@ -323,3 +323,41 @@ conversions confirmed old findings independently: `0x80075760` resolves to
 - **`src/coop/` uses the modern compiler at `-G0`**, as the standalone mod
   does. The matching compiler is GCC 2.7.2, which is C89 and rejects
   declarations after statements.
+
+## How to make the executable smaller — MEASURED 2026-09-01
+
+Space now comes from making the game's own code shorter and spending the slack
+below retail's `.text` boundary, so the layout never moves. Measured options:
+
+| lever | frees | state |
+| --- | --- | --- |
+| **Modern-compile the executable only** | **17,432 bytes** | links; never booted |
+| Remove the crash demo | ~176 bytes | needs a `jr ra` stub per entry |
+| Trimming our own code | tens of bytes | last resort, and the trap below |
+
+**The big lever is the modern compiler, applied to the EXECUTABLE ONLY.** The
+overlays must stay on the matching compiler: `overlays.ld` pins undecompiled
+functions at offsets INSIDE each overlay, so recompiling one moves its own code
+out from under its own pins. Nothing calling into the executable has that
+problem - those references are all by symbol. The Makefile already supports
+per-directory flags, and `shrink-test` in the reference clone does exactly
+this.
+
+17,432 bytes is more than the mod's 11,108, so the mod could live inside the
+executable's slack and leave all 11,136 bytes of BIOS scratch free - about
+2.5x the room we have today.
+
+**What it costs:** the executable stops matching, so its half of the 38-file
+verification goes (the 37 overlays still match, which is worth keeping). And
+it is untested - it links, nobody has booted it.
+
+**A related find:** the modern compiler rejected three of our functions that
+had no prototype at all. In the standalone mod each is reached by a patched
+instruction, so nothing ever called them from C, and GCC 2.7.2 waves implicit
+declarations through. Calling a function with no prototype is only safe by
+luck about argument passing. Fixed on `port`.
+
+**And the trap worth stating plainly:** do NOT trim our own code for bytes.
+This project has a scar from deleting a null check to save four bytes on a
+"provably set" argument where the proof was wrong. Space should come
+structurally - from the executable, not from our safety checks.
