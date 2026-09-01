@@ -26,16 +26,25 @@ Genuinely broken, nobody has decided to live with it. Worst first.
   main HUD had before `Sp1x2HudShift`.
 - **Wanted:** the same treatment as the gems / dragons / lives HUD, which is
   shifted per viewport and, for the side-by-side split, relaid out per moby.
-- **FOUND 2026-08-31: it is drawn by the LEVEL OVERLAY, not by the game's
-  own HUD code.** `include/overlays/flight.inc.h`, the source shared by every
-  flight level, function `Flight5`. That is why it was never found in
-  `hud.c` and why `Sp1x2HudShift` does not touch it.
-- It writes **absolute full-screen coordinates** — `x = 460`, `x = 100`,
-  `x = 320` on a 512-wide screen — through `func_80017FE4` (the same text
-  builder our pause menu uses) and direct `g_HudMobys` writes. It even calls
-  `PutDrawEnv` itself. Fixed 512-wide coordinates explain both symptoms
-  exactly: `x = 460` is far outside a 256-wide vertical viewport, and the
-  rows overhang a 112-line horizontal one.
+- **WHAT IT IS (user, 2026-08-31): ten collectible slots that pop up as you
+  collect during the flight and fade after a second or two.** NOT the results
+  screen, which the user reports looks fine. An earlier note here claimed it
+  was `Flight5`, the results screen — that was wrong, reached by eliminating
+  alternatives rather than by looking, and the user corrected it.
+- **Where it comes from.** `RegisterFlightMobyCollectibleType`
+  (`moby_helpers.c:1818`) bumps `g_FlightObjectiveCounters` and records which
+  types are currently showing in **`g_FlightObjectiveActiveSlots`**
+  (`0x80078608`, four ints; counters at `0x80078630`). The only other code
+  touching that array is `func_level_X_8007CFB4`, the flight levels' moby
+  megafunction — **still assembly, ~5,800 lines**, which spawns character
+  mobys and writes screen positions into them as immediates
+  (`m_Position.x` at moby offset `0xC`; values seen include 30 and 400).
+- So it is neither `hud.c` nor the decompiled part of the flight overlay,
+  which is why two searches missed it.
+- **This may make it easier, not harder.** If those are mobys in the HUD
+  list, our own render pass could reposition them the way `Sp1x2HudShift`
+  already repositions the main HUD — no overlay edit at all. Confirm what
+  they are before designing anything.
 - **THIS IS WHY IT CANNOT BE FIXED TODAY, and space is not the reason.**
   Our architecture patches the executable and *does not patch overlays* at
   all. There is no hook to place. Even with bytes to spare, the code that
