@@ -47,6 +47,50 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## THE PORT IS DONE AND WORKING — 2026-09-01 (user: "seems to be working just fine")
+
+The whole mod now builds INSIDE the decompilation: 3,630 lines, all 24 hooks,
+the intro cutscene playing, the game running. Full detail in
+`docs/decomp/README.md`; what follows is what the process taught.
+
+**THE CEILING NOBODY EXPECTED: THE EXECUTABLE CANNOT GROW.** Not "our hooks
+are wrong" — a build of VANILLA Spyro carrying 12 KB of PADDING and no mod
+code at all breaks the intro cutscene identically. The game fills RAM from
+both ends and expands level and cutscene data into the gap between them;
+growing the executable shrinks that gap. Nothing hardcodes a low address, so
+no amount of relocation helps. **So the mod stays in BIOS scratch, and `.text`
+is padded back to retail's length so every later section keeps its address.**
+I had claimed that fixing overlays.ld's absolute pins "unblocks growing the
+executable". It does not. There were TWO constraints and I had found one.
+
+**THE PROCESS LESSON, and it is the expensive one.** The intro bug took
+roughly eight rounds. Every one of the first six was me reasoning about which
+of OUR hooks was at fault, and the answer was none of them. What finally
+worked was a CONTROL: build vanilla with the same layout shift and nothing
+else. That took ten minutes and settled it outright. **When a port breaks
+something, first vary the ENVIRONMENT with the payload removed — do not
+bisect the payload.** The user had already forced the same correction once
+(the 2026-08-27 baseline retreat) and this file already carried the rule
+"establish the baseline before bisecting". It was not applied. Again.
+
+**WHAT MEASUREMENT DID AND DID NOT BUY.** Six rounds of user memory reads
+(gamestate 14, a valid layout pointer, a climbing tick, 16 actors with 8 alive
+and 5 queued for drawing) were all sound and all eliminated real hypotheses —
+but they were aimed inside the mod, so they could not find a cause that lay
+outside it. Good measurements of the wrong subsystem still cost a day.
+
+**WHAT THE PORT ACTUALLY BOUGHT**, now that space is not on the list:
+real symbols instead of 99 raw addresses, direct calls instead of 24 patched
+instructions, the entry-patch technique retired entirely, and — the only route
+to the flight-HUD bug — the ability to rebuild the level overlays.
+
+**A REAL BUG THE PORT SURFACED IN v0.1:** nothing ever initialised the mod's
+BIOS-scratch state. Every flag and setting sat at a fixed address and the mod
+relied on that memory happening to be zero at boot. It usually is. That is
+luck, not design; the loader now clears it. (Measured innocent of the intro
+bug — the flag read 0 — but a genuine latent fault, and it applies to v0.1
+too.)
+
 ## THE DECOMP BUILDS, AND IT MATCHES — 2026-08-31, ON THIS MACHINE
 
 `reference/spyro-1` was built from source and **all 38 targets match**: PSX.EXE

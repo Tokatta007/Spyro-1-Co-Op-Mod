@@ -182,6 +182,20 @@ release readme, not in a bug tracker.
 
 ## 4. Recently fixed — needs confirmation
 
-*Nothing outstanding.*
+**C3 — The decomp port.** *User-confirmed booting and playing 2026-09-01;
+everything beyond the intro is still lightly tested.*
+
+- The mod now builds inside the decompilation. Same behaviour, different
+  construction: direct calls instead of 24 patched instructions, real symbols
+  instead of raw addresses, and the collision guards are ordinary wrappers
+  rather than entry patches.
+- **Watch for:** anything that differs from v0.1. Both discs are kept side by
+  side (`spyro1-coop.cue` is v0.1, `spyro1-port.cue` is the port), so any
+  difference can be compared directly rather than guessed at. The logic was
+  translated unchanged precisely so that a bug has a v0.1 counterpart.
+- Three bugs found and fixed during the port, all worth knowing:
+  the vsync counters were bound 0x40 low and overwrote the portal-wait flag;
+  six raw addresses survived the first conversion pass; and the executable
+  cannot grow at all (see `docs/decomp/README.md`).
 
 ---

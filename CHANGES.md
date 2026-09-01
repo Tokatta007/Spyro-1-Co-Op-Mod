@@ -416,6 +416,34 @@ is a shortcut around a safety check.
 
 No new hook: this rides the existing death handler on hooks 17 and 18.
 
+## 5h. 2026-09-01 — a second build of the mod exists, inside the decompilation
+
+**This file describes the STANDALONE mod** — the one that patches 24
+instructions into the retail executable, and the one v0.1 ships. That remains
+the released artifact and everything above still describes it exactly.
+
+There is now a second construction of the same mod, built from
+TheMobyCollective's decompilation, in `reference/spyro-1` on the `port`
+branch. Same behaviour, same logic, different assembly:
+
+| | standalone (this file) | decomp port |
+| --- | --- | --- |
+| Hooks | 24 patched instructions | direct calls in C, 3 in assembly |
+| Game symbols | 99 raw addresses | real symbols |
+| Collision guards | entry patches | ordinary wrappers |
+| Delivery | hand-built payload + boot stub | linker sections + boot copier |
+| Overlays | cannot be touched | rebuilt from source |
+
+**The memory map in section 3 is unchanged and still authoritative for both.**
+The port's code lives in the same BIOS scratch regions at the same addresses,
+because the executable turns out not to be able to grow — see
+`docs/decomp/README.md`, which is the port's own record.
+
+Two scripts support it: `mod/scripts/check_names.py` (every ported name
+resolves to the address the mod expects, and no raw game addresses survive)
+and `mod/scripts/overlay_map.py` / `inject_overlays.py` (locating and
+replacing overlays inside `WAD.WAD`).
+
 ## 6. Build verification — what `make` checks every time
 
 `scripts/verify.py` runs at the end of every `make`. Each check exists because

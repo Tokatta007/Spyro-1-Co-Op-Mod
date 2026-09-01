@@ -1,0 +1,17 @@
+diff --git a/psx.ld b/psx.ld
+index 8712410..f7f791a 100644
+--- a/psx.ld
++++ b/psx.ld
+@@ -219,6 +219,12 @@ SECTIONS
+ 
+         #endif
+ 
++        /* SHIFT TEST, 2026-08-31: 12 KB of nothing, to move main_BSS_END by
++           the same amount the co-op mod's code does - without any of the
++           mod. If the intro cutscene breaks with this alone, the bug is the
++           LAYOUT SHIFT and not our hooks. */
++        . = . + 0x3000;
++
+         . = ALIGN(., 4);
+         main_TEXT_END = .;
+         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);

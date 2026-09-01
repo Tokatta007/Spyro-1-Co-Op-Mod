@@ -52,11 +52,52 @@ executable, and only one is solved:
   1. overlays.ld's absolute pins - fixed, see below;
   2. the bottom-up/top-down gap - NOT fixed, and not fixable by relocation.
 
-**So our code cannot live in the executable.** It has to go where it does
-today: BIOS scratch RAM, which is below the game and outside both growth
-directions. The port keeps everything else it gained - real symbols, direct
-calls instead of 24 patched instructions, and the ability to rebuild overlays
-- but not free space.
+**So our code cannot live in the executable.** It goes where the standalone
+mod puts it: BIOS scratch RAM, below the game and outside both growth
+directions. **DONE AND USER-CONFIRMED 2026-09-01** - the intro plays and the
+mod works. The port keeps everything else it gained (real symbols, direct
+calls instead of 24 patched instructions, the ability to rebuild overlays) but
+not free space.
+
+### How the mod is delivered now
+
+Three chunks are appended to the executable. The BIOS loads them to
+`0x80075800`, which is inside `.bss` - safe because the header declares
+**`b_size = 0`**, so the BIOS zeroes nothing and the game clears `.bss` itself
+in its own startup, which runs after us. `Sp1x2Loader` is the executable's
+entry point (`pc0`), lives in the sector padding above `main_SDATA_END`,
+clears the mod's scratch, copies the three chunks out, flushes the I-cache and
+jumps to the game's real entry. It is then overwritten by `.bss`, which is
+fine - it runs once.
+
+**`.text` is padded back to retail's length** so every section after it keeps
+its address. All three boundaries match retail exactly: `main_TEXT_END`
+`0x8006BBE0`, `main_SDATA_END` `0x80075640`, `main_BSS_END` `0x8007AA38`.
+
+### FOUR TRAPS, all of which cost a build
+
+1. **Pad in `.text`, never after `.sdata`.** Padding between `.sdata` and
+   `.sbss` pushed the game's `$gp`-relative globals out of the +/-32KB window
+   and the link died with dozens of `relocation truncated to fit
+   R_MIPS_GPREL16`.
+2. **Inside a section description GNU ld treats `.` as an offset from the
+   section start, not an absolute address.** `. = 0x8006bbe0` silently
+   produced addresses 0x7FFF0000 low, and the overlays then failed to link
+   with `R_MIPS_26` overflows. Write `. = 0x8006bbe0 - 0x80010000`.
+3. **`t_size` must be a whole number of 2048-byte sectors** or the BIOS hangs
+   at the boot logo with no error - the same trap that cost a boot failure in
+   August. The payload is padded to `0x3000` so `t_size` is `0x68800` = 209.00.
+4. **Anything that only runs at boot belongs in the loader, not in scratch.**
+   `Sp1x2Init` moved there and kept 36 bytes out of a region with a dozen to
+   spare.
+
+### Space, as it now stands
+
+The mod is 11,108 bytes against 11,136 of usable scratch, so the packing is at
+function granularity and the margin is: **LOADER ~28 bytes, BIOS2 ~8, BIOS2B
+~16.** Anything new needs space found first. The way to get it is to make the
+executable SMALLER and spend the slack while padding `.text` back to retail's
+length - which is what the modern compiler's ~22 KB would actually buy.
 
 The way to get space back later is to make the executable SMALLER and spend
 the slack while padding `main_SDATA_END` to its retail value, so the layout
