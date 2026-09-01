@@ -39,8 +39,36 @@ Genuinely broken, nobody has decided to live with it. Worst first.
   megafunction — **still assembly, ~5,800 lines**, which spawns character
   mobys and writes screen positions into them as immediates
   (`m_Position.x` at moby offset `0xC`; values seen include 30 and 400).
+- **CONFIRMED FROM USER SCREENSHOTS + MEMORY, 2026-08-31.** The in-flight
+  display has TWO parts, both in screen space for a 512-wide screen:
+    1. a row of **8 collectible icons at the TOP-LEFT** (`x = 30`), filled
+       according to how many of that type you have;
+    2. the **countdown timer at the TOP-RIGHT** (`x = 400`) — the user also
+       wants this handled.
+  `g_FlightObjectiveCounters` at **`0x80078630`** is verified against the
+  screen twice over: `[0, 2, 0, 0]` in flight with two arches lit, and
+  `[0, 7, 2, 0]` on a results screen reading BARRELS 0/8, ARCHES 7/8, PLANES
+  2/8, CHESTS 0/8. So the indices are barrels, arches, planes, chests.
+  `g_FlightObjectiveActiveSlots` read all `-1` on both captures, so it is not
+  what gates visibility — do not build on that assumption.
+- **The results screen is fine** and needs no work. An earlier report of
+  collectibles rendering as "1"/"0" while correctly coloured did not
+  reproduce, and nothing looked wrong in memory; treat it as fixed by
+  something since, and log it again only if it returns.
 - So it is neither `hud.c` nor the decompiled part of the flight overlay,
   which is why two searches missed it.
+- **COST, measured 2026-08-31.** The position writes reach the display mobys
+  through a register chain (`$a1` from `$s3`, set far earlier) inside that
+  5,800-line assembly function. Moving them means either tracing those
+  registers to find where the display mobys are stored, or decompiling that
+  part. Neither is a coordinate tweak.
+- **AND IT CANNOT BE TESTED YET.** The decomp build has no split screen,
+  because the mod is not ported to it, so there is nothing there for a fix to
+  be right or wrong against. Doing this before the port means writing code
+  that cannot be verified. **Port first.**
+- One simplification worth remembering when it is time: flight levels are
+  effectively single-player in the mod (player 2 is frozen), so this needs
+  ONE correctly-placed HUD, not one per viewport.
 - **This may make it easier, not harder.** If those are mobys in the HUD
   list, our own render pass could reposition them the way `Sp1x2HudShift`
   already repositions the main HUD — no overlay edit at all. Confirm what
