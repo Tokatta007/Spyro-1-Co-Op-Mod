@@ -66,9 +66,16 @@ Genuinely broken, nobody has decided to live with it. Worst first.
   because the mod is not ported to it, so there is nothing there for a fix to
   be right or wrong against. Doing this before the port means writing code
   that cannot be verified. **Port first.**
-- One simplification worth remembering when it is time: flight levels are
-  effectively single-player in the mod (player 2 is frozen), so this needs
-  ONE correctly-placed HUD, not one per viewport.
+- **It needs a HUD PER VIEWPORT, like the main one.** Flight levels are fully
+  two-player: both dragons fly and play. An older note in this project called
+  them "single-player, player 2 frozen" — that has been out of date for some
+  time and the user corrected it on 2026-08-31. The only outstanding flight
+  problem is player 2's Y-axis steering, which is parked separately.
+- Wanted layout, per the user: **horizontal split — across the top of each
+  view; vertical split — top-left going down**, matching what
+  `Sp1x2HudShift` does for gems, dragons and lives. Stock layout in
+  one-player. The **timer belongs top-right** of each view and is drawn by
+  the same code, so it comes along with the same change.
 - **This may make it easier, not harder.** If those are mobys in the HUD
   list, our own render pass could reposition them the way `Sp1x2HudShift`
   already repositions the main HUD — no overlay edit at all. Confirm what
