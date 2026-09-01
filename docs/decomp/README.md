@@ -132,3 +132,41 @@ what an edit can expand into before it would disturb anything after it:
 
 Icy flight is the tight one at 256 bytes. A per-viewport HUD reposition should
 fit, but it is worth checking the worst case first rather than last.
+
+## Booting a decomp-built disc — the procedure
+
+Our own pipeline packs the disc; the decomp only produces `PSX.EXE` and the
+`.ovl` files. To make a disc from a decomp build:
+
+1. Stage the executable: copy `reference/spyro-1/build/PSX.EXE` over
+   `mod/projects/ntsc/build/rom/SCUS_942.28`.
+2. **Regenerate the disc XML** — do not reuse our mod's. `spyro1-coop.xml`
+   carries sector padding computed for OUR executable, which is 5 sectors
+   larger than retail. `create_mkpsxiso_xml.py` compares `rom/<file>` against
+   `build/rom/<file>` and adjusts the `<dummy sectors>` count so every file
+   after it keeps its LBA. With a retail-sized executable it restores the
+   retail figure of 5921. Getting this wrong shifts every file after the
+   executable and the game reads the wrong sectors.
+3. `mkpsxiso -y -lba build/decomp.lba -c ... -o ... build/decomp.xml`
+4. Restore our own `SCUS_942.28` afterwards.
+
+**TRAP, cost half an hour: mkpsxiso does NOT zero dummy sectors, so writing
+over an existing image leaves stale bytes from the previous layout.** A first
+attempt with the wrong padding left ~1,035 bytes of debris in the gap before
+`PETEXA0.STR` that survived the corrected rebuild. It looked like a layout
+error and was not. **Delete the .bin before repacking**, and confirm with the
+`.lba` file that the LBAs are what you expect.
+
+## Verified end to end, 2026-08-31
+
+Changed one constant (`initialization.c`, starting lives 4 -> 9) and rebuilt.
+
+- The executable differs from the matching build by **exactly one byte**
+- All **37 overlays stay byte-identical** to retail
+- The disc differs from retail in **two clusters only**: 1,185 bytes of ISO
+  metadata, which is *exactly* what our known-working v0.1 disc also differs
+  by, and 37 bytes at the executable, being our one byte plus its sector's
+  error-correction data
+
+So the chain source -> executable -> disc is sound, and our v0.1 disc is the
+control that proves the metadata difference is harmless.
