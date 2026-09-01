@@ -1,0 +1,150 @@
+{
+  "credits.ovl": {
+    "offset": 97089536,
+    "size": 8192
+  },
+  "level_0_artisans_home_code.ovl": {
+    "offset": 8333312,
+    "size": 57344
+  },
+  "level_10_peace_keepers_doctor_shemp_code.ovl": {
+    "offset": 37212160,
+    "size": 51200
+  },
+  "level_11_peace_keepers_night_flight_code.ovl": {
+    "offset": 39385088,
+    "size": 38912
+  },
+  "level_12_magic_crafters_home_code.ovl": {
+    "offset": 41054208,
+    "size": 81920
+  },
+  "level_13_magic_crafters_alpine_ridge_code.ovl": {
+    "offset": 44013568,
+    "size": 79872
+  },
+  "level_14_magic_crafters_high_caves_code.ovl": {
+    "offset": 46843904,
+    "size": 73728
+  },
+  "level_15_magic_crafters_wizard_peak_code.ovl": {
+    "offset": 49655808,
+    "size": 65536
+  },
+  "level_16_magic_crafters_blowhard_code.ovl": {
+    "offset": 52383744,
+    "size": 53248
+  },
+  "level_17_magic_crafters_crystal_flight_code.ovl": {
+    "offset": 54392832,
+    "size": 40960
+  },
+  "level_18_beast_makers_home_code.ovl": {
+    "offset": 56147968,
+    "size": 67584
+  },
+  "level_19_beast_makers_terrace_village_code.ovl": {
+    "offset": 58664960,
+    "size": 53248
+  },
+  "level_1_artisans_stone_hill_code.ovl": {
+    "offset": 12072960,
+    "size": 65536
+  },
+  "level_20_beast_makers_misty_bog_code.ovl": {
+    "offset": 61267968,
+    "size": 51200
+  },
+  "level_21_beast_makers_tree_tops_code.ovl": {
+    "offset": 64458752,
+    "size": 61440
+  },
+  "level_22_beast_makers_metalhead_code.ovl": {
+    "offset": 67258368,
+    "size": 65536
+  },
+  "level_23_beast_makers_wild_flight_code.ovl": {
+    "offset": 69560320,
+    "size": 40960
+  },
+  "level_24_dream_weavers_home_code.ovl": {
+    "offset": 71151616,
+    "size": 71680
+  },
+  "level_25_dream_weavers_dark_passage_code.ovl": {
+    "offset": 73900032,
+    "size": 55296
+  },
+  "level_26_dream_weavers_lofty_castle_code.ovl": {
+    "offset": 76791808,
+    "size": 53248
+  },
+  "level_27_dream_weavers_haunted_towers_code.ovl": {
+    "offset": 79038464,
+    "size": 61440
+  },
+  "level_28_dream_weavers_jacques_code.ovl": {
+    "offset": 81723392,
+    "size": 49152
+  },
+  "level_29_dream_weavers_icy_flight_code.ovl": {
+    "offset": 84080640,
+    "size": 40960
+  },
+  "level_2_artisans_dark_hollow_code.ovl": {
+    "offset": 15687680,
+    "size": 45056
+  },
+  "level_30_gnastys_world_gnorc_gnexus_code.ovl": {
+    "offset": 85864448,
+    "size": 47104
+  },
+  "level_31_gnastys_world_gnorc_cove_code.ovl": {
+    "offset": 88383488,
+    "size": 57344
+  },
+  "level_32_gnastys_world_twilight_harbor_code.ovl": {
+    "offset": 91002880,
+    "size": 47104
+  },
+  "level_33_gnastys_world_gnasty_gnorc_code.ovl": {
+    "offset": 93394944,
+    "size": 45056
+  },
+  "level_34_gnastys_world_gnastys_loot_code.ovl": {
+    "offset": 95332352,
+    "size": 49152
+  },
+  "level_3_artisans_town_square_code.ovl": {
+    "offset": 18409472,
+    "size": 63488
+  },
+  "level_4_artisans_toasty_code.ovl": {
+    "offset": 21495808,
+    "size": 40960
+  },
+  "level_5_artisans_sunny_flight_code.ovl": {
+    "offset": 23756800,
+    "size": 43008
+  },
+  "level_6_peace_keepers_home_code.ovl": {
+    "offset": 25681920,
+    "size": 75776
+  },
+  "level_7_peace_keepers_dry_canyon_code.ovl": {
+    "offset": 28504064,
+    "size": 77824
+  },
+  "level_8_peace_keepers_cliff_town_code.ovl": {
+    "offset": 31465472,
+    "size": 71680
+  },
+  "level_9_peace_keepers_ice_cavern_code.ovl": {
+    "offset": 34185216,
+    "size": 49152
+  },
+  "titlescreen_code.ovl": {
+    "offset": 374784,
+    "size": 14336
+  }
+}
