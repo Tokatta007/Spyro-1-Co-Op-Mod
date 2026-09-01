@@ -24,7 +24,46 @@ Setup, of which only step 4 is in their README:
 4. `docker run --rm --platform linux/amd64 -v "$(pwd)":/s1 s1_dev_env \
     bash -c 'make -j4 all'`
 
-## THE BLOCKER — SOLVED AND USER-TESTED 2026-08-31
+## THE REAL CEILING: THE EXECUTABLE CANNOT GROW (2026-08-31)
+
+**Proven by experiment, and it is a harder limit than the overlay pins.**
+
+A build of VANILLA Spyro - no mod code at all, just `. = . + 0x3000;` in
+`.text` so `main_BSS_END` moves by the 12 KB our code moves it - **breaks the
+intro cutscene in exactly the way the ported mod does**: the world renders,
+the actors never appear. User-confirmed.
+
+So the mod's hooks are innocent. What breaks is growing the executable.
+
+**Why.** The game fills RAM from both ends. The executable and its `.bss` grow
+UP, then the level overlay and level data; from `0x80200000` the stack, shared
+animations, particles, ordering tables and poly buffers grow DOWN
+(`4BEF8.c:53`, `initialization.c:303`). Nothing in the game hardcodes a low
+address - the top-down side is all computed from `0x80200000` - so this is not
+a stale pointer. It is that the GAP between the two shrinks by exactly as much
+as the executable grows, and the intro cutscene needs more of it than is then
+left. Its actors end up positioned and queued for drawing (measured: 16
+actors, 8 alive, 5 queued) with their geometry corrupt.
+
+**What this means for the port.** Fixing the overlay pins was necessary but
+NOT sufficient. There are two independent constraints on growing the
+executable, and only one is solved:
+
+  1. overlays.ld's absolute pins - fixed, see below;
+  2. the bottom-up/top-down gap - NOT fixed, and not fixable by relocation.
+
+**So our code cannot live in the executable.** It has to go where it does
+today: BIOS scratch RAM, which is below the game and outside both growth
+directions. The port keeps everything else it gained - real symbols, direct
+calls instead of 24 patched instructions, and the ability to rebuild overlays
+- but not free space.
+
+The way to get space back later is to make the executable SMALLER and spend
+the slack while padding `main_SDATA_END` to its retail value, so the layout
+never moves. That is what the modern compiler's ~22 KB would actually buy, and
+it is a different argument from the one made for it earlier.
+
+## THE OVERLAY-PIN BLOCKER — SOLVED AND USER-TESTED 2026-08-31
 
 The pins below are now expressed relative to the overlay base, and a disc
 built that way **played three levels with no crashes, glitches or visible
