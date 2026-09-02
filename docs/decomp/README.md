@@ -1,7 +1,11 @@
 # Building the mod inside the decompilation
 
 Findings from 2026-08-31. `reference/spyro-1` is untracked and has its own
-upstream, so anything we do there must be kept here as a patch or it is lost.
+upstream, so the mod's work there lives on a FORK, not in this repository and
+not as patches: **https://github.com/Tokatta007/spyro-1, branch
+`port-shrink`** (remote `fork`). Push to it after any change there. The local
+clone is not a backup — it is gitignored, and until 2026-09-02 the entire port
+existed nowhere else.
 
 ## The decomp builds, and it matches
 

@@ -68,7 +68,7 @@ per-player state.
 ```
 mod/           the mod: source, build scripts, and linker script
 docs/          research notes, and history/ for superseded investigations
-reference/     external projects we read but never build (untracked)
+reference/     external projects; spyro-1 is built from (untracked)
 CHANGES.md     what the mod changes, and what the build verifies
 BUGS.md        open work: active, parked, accepted
 CLAUDE.md      working notes and the investigation log
@@ -77,6 +77,11 @@ CLAUDE.md      working notes and the investigation log
 `Roms/`, `reference/`, and `tools/` are local working directories and are
 deliberately not tracked. `reference/` holds the projects this work draws on,
 each of which has its own upstream repository.
+
+Because the release is built from `reference/spyro-1` and that folder is not
+tracked here, the mod's ported source lives on a fork of the decompilation:
+**[Tokatta007/spyro-1, branch `port-shrink`](https://github.com/Tokatta007/spyro-1/tree/port-shrink)**.
+Clone it to `reference/spyro-1` to rebuild the release.
 
 ## Building from source
 
