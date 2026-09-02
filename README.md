@@ -80,15 +80,32 @@ each of which has its own upstream repository.
 
 ## Building from source
 
-Building from scratch is only needed if you want to modify the mod. Most
-players should use the patch.
+Building is only needed if you want to modify the mod. Most players should use
+the patch.
 
-Requires a `mipsel-none-elf` GCC cross-compiler (the PlayStation runs a MIPS
-processor, so the code has to be built by a compiler that targets it rather
-than your own machine), Python 3, and
-[mkpsxiso](https://github.com/Lameguy64/mkpsxiso) 2.30 or newer for repacking
-the disc. `CLAUDE.md` records how that toolchain was installed on macOS,
-including two patches that were needed to get it to build at all.
+The mod exists in **two constructions**, and it matters which one you build.
+
+**The one that ships** is compiled inside
+[TheMobyCollective's decompilation](https://github.com/TheMobyCollective/spyro-1),
+because that is the only construction that can rebuild the game's level
+overlays — which several fixes, including the flight-level HUD, depend on.
+
+```sh
+./mod/scripts/build_release.sh v0.2
+```
+
+That script documents its own prerequisites at the top: Docker with the
+decomp's build image, the PSYQ headers, the `maspsx` submodule, your own
+retail disc, and `mkpsxiso` and `xdelta3` on your PATH. It builds the disc,
+produces the `.xdelta`, and then verifies the patch by applying it to a fresh
+copy of the source disc and checking the result matches the build
+byte-for-byte. A patch that does not round-trip is worse than none, because it
+fails on someone else's machine after they have already downloaded it.
+
+**The standalone one** patches 24 individual instructions into the retail
+executable and needs no decompilation, no Docker, and no Python beyond the
+build scripts. It is how the mod was originally written and it still builds,
+but it cannot touch the overlays:
 
 ```sh
 cd mod/projects/ntsc
@@ -97,16 +114,18 @@ make           # builds the executable and runs the verification gate
 make disc      # repacks the playable disc
 ```
 
-`make` alone does **not** produce a playable disc — `make disc` does.
-`make patch` then produces the distributable `.xdelta` in `build/release/`,
-and verifies it by applying it to a fresh copy of the source disc and checking
-the result matches the build byte-for-byte. A patch that does not round-trip
-is worse than none, because it fails on someone else's machine after they have
-already downloaded it.
+`make` alone does **not** produce a playable disc — `make disc` does. This path
+needs a `mipsel-none-elf` GCC cross-compiler (the PlayStation runs a MIPS
+processor, so the code has to be built by a compiler that targets it rather
+than your own machine), Python 3, and
+[mkpsxiso](https://github.com/Lameguy64/mkpsxiso) 2.30 or newer. `CLAUDE.md`
+records how that toolchain was installed on macOS, including two patches that
+were needed to get it to build at all.
 
-Every build verifies itself: that only the intended instructions changed, that
-each hook reaches the function it names, that no memory allocations overlap,
-and that every hook is documented. See section 6 of [CHANGES.md](CHANGES.md).
+Either way the build verifies itself: that only the intended instructions
+changed, that each hook reaches the function it names, that no memory
+allocations overlap, and that every hook is documented. See section 6 of
+[CHANGES.md](CHANGES.md).
 
 ## Contributing
 
