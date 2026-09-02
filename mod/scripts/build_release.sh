@@ -2,6 +2,8 @@
 #
 # Build the co-op mod's release disc and patch, from the decompilation.
 #
+#   ./build_release.sh [version]      default: v0.2
+#
 # The mod has two constructions. The STANDALONE one patches 24 instructions
 # into the retail executable and is what `make` in mod/projects/ntsc builds.
 # This script builds the other: the mod compiled inside TheMobyCollective's
@@ -27,6 +29,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DECOMP="$ROOT/reference/spyro-1"
 NTSC="$ROOT/mod/projects/ntsc"
 NAME="spyro1-coop"
+# The build output keeps a stable name; the DOWNLOAD carries the version, so
+# whoever still has the file in six months can tell what it is.
+VERSION="${1:-v0.2}"
 
 say() { printf '\n=== %s ===\n' "$1"; }
 
@@ -87,10 +92,13 @@ if [ "$built" != "$back" ]; then
     echo "         patched: $back"
     exit 1
 fi
-cp "build/disc/$NAME.cue" "build/release/$NAME.cue"
+cp "build/disc/$NAME.cue" "build/release/$NAME-$VERSION.cue"
+mv "build/release/$NAME.xdelta" "build/release/$NAME-$VERSION.xdelta"
 
 say "done"
 echo "  disc SHA-1 : $built"
 echo "  source disc: $(shasum disc/spyro1.bin | cut -d' ' -f1)"
-echo "  patch      : build/release/$NAME.xdelta ($(wc -c < "build/release/$NAME.xdelta" | tr -d ' ') bytes)"
-echo "  cue        : build/release/$NAME.cue"
+echo "  patch      : build/release/$NAME-$VERSION.xdelta ($(wc -c < "build/release/$NAME-$VERSION.xdelta" | tr -d ' ') bytes)"
+echo "  cue        : build/release/$NAME-$VERSION.cue"
+echo
+echo "  Upload BOTH to the release. The disc itself is never distributed."
