@@ -47,6 +47,49 @@ Roms/, reference/, Spyro2x2/ and tools/ stay untracked.
 - **`CLAUDE.md`** (this file) — the investigation log: how things were found,
   what was tried and failed, and the rules those failures taught.
 
+## FLIGHT HUD FIXED 2026-09-01 (user: "pretty much perfect") — AND THREE LESSONS
+
+The flight levels' collectible icons and timer now sit inside each viewport:
+across the top horizontally, a column down the top-left vertically, timer
+top-right. **The first thing the port made possible that v0.1 could not do.**
+
+**NOT FIXED WHERE IT IS DRAWN.** The elements are written by
+`func_level_X_8007CFB4` — which is FIVE hand-written assembly functions
+(5,043-5,785 lines, similar but not identical) — so editing them would have
+been five archaeology jobs. They are ordinary level mobys carrying SCREEN-space
+positions, so our render pass shifts them instead, exactly as it already does
+the main HUD. Identification is by coordinate range, which is a heuristic, kept
+conservative so the failure mode is "the HUD does not move", never "a world
+object teleports".
+
+**LESSON 1 — THE SAME BUG THREE TIMES: A RESTORE THAT IS NOT AN INVERSE.**
+Going in was `(x >> 1) + delta`; coming out was written `(x << 1) - delta`,
+which is a DIFFERENT FUNCTION, so every frame corrupted positions instead of
+restoring them and the HUD drifted away permanently. The user's own
+observation found it: "the timer disappears if you go vertical and then back
+to horizontal" — state destroyed, not state mispositioned. **The cure was to
+stop inverting at all: record each moby with the position it had and replay
+those values.** Correct by construction whatever the layout does — and it had
+to be, because the final column layout HAS no inverse (every icon shares one
+X). Prefer save-and-replay over invert-the-maths for anything reversible.
+
+**LESSON 2 — READ THE MAPPING, DO NOT INFER IT FROM SCREENSHOTS.** Two rounds
+were spent guessing coordinates. `Sp1x2SetViewport` states it outright: each
+pass offsets DRAWENV by a quarter of the split axis, one negative and one
+positive, and clips to its own half — so BOTH passes show the same source
+window, Y in [56,168] horizontally and X in [128,384] vertically. Every layout
+constant after that was arithmetic rather than trial and error.
+
+**LESSON 3 — CHECK THE GEOMETRY BEFORE PROMISING A LAYOUT.** Eight ~36px icons
+need 288px; a vertical viewport is 256. They CANNOT go across it at any scale,
+which is why the user's own suggestion — a column, as the main HUD already
+does — was the answer. Uniform scaling was already at 86% of its theoretical
+maximum and could never have looked right.
+
+**AND ONE ORDINARY SLIP:** the column index used the save-table index, which
+counts the timer's glyphs too, so the icons began four slots down and ran off
+the bottom. The screenshot's arithmetic (y = 120, 144, 168...) named it exactly.
+
 ## THE PORT IS DONE AND WORKING — 2026-09-01 (user: "seems to be working just fine")
 
 The whole mod now builds INSIDE the decompilation: 3,630 lines, all 24 hooks,

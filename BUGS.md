@@ -16,84 +16,8 @@ Last reviewed: 2026-08-30.
 
 Genuinely broken, nobody has decided to live with it. Worst first.
 
-**A2 — The flight-level collectible HUD is mispositioned in split-screen.**
-
-- Reported 2026-08-30: it does not appear at all in the **vertical** split,
-  and is visible but **cut off** in the horizontal one.
-- The shape of that is a HUD drawn at fixed coordinates for a full 512x240
-  screen: in horizontal it overhangs the half-height viewport, and in
-  vertical it sits outside a 256-wide one entirely. Exactly the fault the
-  main HUD had before `Sp1x2HudShift`.
-- **Wanted:** the same treatment as the gems / dragons / lives HUD, which is
-  shifted per viewport and, for the side-by-side split, relaid out per moby.
-- **WHAT IT IS (user, 2026-08-31): ten collectible slots that pop up as you
-  collect during the flight and fade after a second or two.** NOT the results
-  screen, which the user reports looks fine. An earlier note here claimed it
-  was `Flight5`, the results screen — that was wrong, reached by eliminating
-  alternatives rather than by looking, and the user corrected it.
-- **Where it comes from.** `RegisterFlightMobyCollectibleType`
-  (`moby_helpers.c:1818`) bumps `g_FlightObjectiveCounters` and records which
-  types are currently showing in **`g_FlightObjectiveActiveSlots`**
-  (`0x80078608`, four ints; counters at `0x80078630`). The only other code
-  touching that array is `func_level_X_8007CFB4`, the flight levels' moby
-  megafunction — **still assembly, ~5,800 lines**, which spawns character
-  mobys and writes screen positions into them as immediates
-  (`m_Position.x` at moby offset `0xC`; values seen include 30 and 400).
-- **CONFIRMED FROM USER SCREENSHOTS + MEMORY, 2026-08-31.** The in-flight
-  display has TWO parts, both in screen space for a 512-wide screen:
-    1. a row of **8 collectible icons at the TOP-LEFT** (`x = 30`), filled
-       according to how many of that type you have;
-    2. the **countdown timer at the TOP-RIGHT** (`x = 400`) — the user also
-       wants this handled.
-  `g_FlightObjectiveCounters` at **`0x80078630`** is verified against the
-  screen twice over: `[0, 2, 0, 0]` in flight with two arches lit, and
-  `[0, 7, 2, 0]` on a results screen reading BARRELS 0/8, ARCHES 7/8, PLANES
-  2/8, CHESTS 0/8. So the indices are barrels, arches, planes, chests.
-  `g_FlightObjectiveActiveSlots` read all `-1` on both captures, so it is not
-  what gates visibility — do not build on that assumption.
-- **The results screen is fine** and needs no work. An earlier report of
-  collectibles rendering as "1"/"0" while correctly coloured did not
-  reproduce, and nothing looked wrong in memory; treat it as fixed by
-  something since, and log it again only if it returns.
-- So it is neither `hud.c` nor the decompiled part of the flight overlay,
-  which is why two searches missed it.
-- **COST, measured 2026-08-31.** The position writes reach the display mobys
-  through a register chain (`$a1` from `$s3`, set far earlier) inside that
-  5,800-line assembly function. Moving them means either tracing those
-  registers to find where the display mobys are stored, or decompiling that
-  part. Neither is a coordinate tweak.
-- **AND IT CANNOT BE TESTED YET.** The decomp build has no split screen,
-  because the mod is not ported to it, so there is nothing there for a fix to
-  be right or wrong against. Doing this before the port means writing code
-  that cannot be verified. **Port first.**
-- **It needs a HUD PER VIEWPORT, like the main one.** Flight levels are fully
-  two-player: both dragons fly and play. An older note in this project called
-  them "single-player, player 2 frozen" — that has been out of date for some
-  time and the user corrected it on 2026-08-31. The only outstanding flight
-  problem is player 2's Y-axis steering, which is parked separately.
-- Wanted layout, per the user: **horizontal split — across the top of each
-  view; vertical split — top-left going down**, matching what
-  `Sp1x2HudShift` does for gems, dragons and lives. Stock layout in
-  one-player. The **timer belongs top-right** of each view and is drawn by
-  the same code, so it comes along with the same change.
-- **This may make it easier, not harder.** If those are mobys in the HUD
-  list, our own render pass could reposition them the way `Sp1x2HudShift`
-  already repositions the main HUD — no overlay edit at all. Confirm what
-  they are before designing anything.
-- **THIS IS WHY IT CANNOT BE FIXED TODAY, and space is not the reason.**
-  Our architecture patches the executable and *does not patch overlays* at
-  all. There is no hook to place. Even with bytes to spare, the code that
-  needs changing is not code we can reach.
-- **With the decompilation it becomes ordinary work**, because overlays are
-  built from source there — `make` produces all 37 of them. This is the
-  clearest single argument for that pivot: it turns an impossible item into
-  a normal one.
-- **And it is fixable there sooner than expected (2026-08-31).** The
-  decomp pins some undecompiled overlay functions to absolute addresses,
-  which would make editing an overlay risky — but the five flight levels
-  carry **none** of those pins. Their overlays can be rebuilt freely. See
-  `docs/decomp/README.md`.
-- Cosmetic, and confined to the four flight levels.
+*Nothing.* Cleared again on 2026-09-01 when the flight-level HUD was fixed.
+Anything new goes here.
 
 ---
 
@@ -181,6 +105,20 @@ release readme, not in a bug tracker.
 ---
 
 ## 4. Recently fixed — needs confirmation
+
+**C4 — Flight-level HUD in split-screen.** *User-confirmed 2026-09-01
+("pretty much perfect").*
+
+- The collectible icons and countdown timer were drawn for a full 512x240
+  screen: cut off in a horizontal split, and the timer lost entirely in a
+  vertical one.
+- Fixed from our own render pass rather than in the overlays. See
+  `Sp1x2Flight.c`; the reasoning is worth reading before touching it.
+- **Watch for:** anything in the WORLD moving that should not. Elements are
+  identified by having screen-space coordinates, which is a heuristic - a
+  deliberately conservative one, but a heuristic.
+
+---
 
 **C3 — The decomp port.** *User-confirmed booting and playing 2026-09-01;
 everything beyond the intro is still lightly tested.*
