@@ -254,6 +254,73 @@ colour menu — needs space FOUND, not shaved.
 The deferred pad poll works. Interrupts stay enabled, the hard freeze is gone,
 and input feels normal for both players. **A2 is closed.**
 
+## CAMERA SPASM — 2026-09-02 SESSION: TWO THEORIES CLOSED, ONE FACT GAINED
+
+Stopped by agreement after four measured rounds. **The spasm is NOT fixed.**
+What follows is what is now known for certain, so the next attempt does not
+re-tread it.
+
+**THE NULL FOCUS WAS REAL, IS FIXED, AND WAS NEVER THE CAUSE.**
+`g_Spyro + 0x21C` is an uninitialised pointer. Its ONLY writers anywhere are
+level overlays 32/33/34/50/61, so in every other level it holds zero from level
+load — measured null for BOTH players in the Peace Keepers homeworld (live
+0x80078C74 = 0, player 2's shadow 0x8000EA1C = 0). `func_8003FE40` stores it
+straight into `g_Camera.m_Focus` at 0x80040234 **unchecked**, and 0x80040214 is
+the ONLY read of that field in the whole game and does not branch on it — so a
+null there is never a flag, just an uninitialised pointer with one consumer.
+All 17 stores to m_Focus were read; **not one writes a literal zero**, so the
+null could have no other source.
+A probe counted, after a session with spasms: **0 / 2 / 0 / 1** — player 2's
+TICK installed a null twice, one survived his camera update, player 1 clean.
+Arming the pointer before each tick fixed it: all four counters then read zero
+across a full session. **AND THE SPASM CONTINUED UNCHANGED.**
+So the focus theory is closed for the second time, now with a measurement on
+both sides — the null happening, and the null gone. **DO NOT RE-OPEN IT.**
+Sp1x2FixFocus (retired 2026-08-30 for the same reason) was right to go.
+
+**THE RADIUS GOES BAD, AND ONLY FOR PLAYER 2 — the one new fact.**
+Camera position is `*m_Focus + spherical(m_Sphere)`, so with the focus provably
+healthy the radius was the only remaining input. Measured over a session:
+    0x8000ED70 = 2      always player 2's camera update; player 1 NEVER
+    0x8000ED74 = 9,793  the radius (normal follow is ~2,560)
+    0x8000ED78 = 18,316 distance between the dragons at that moment
+    0x8000ED7C = 34     bad radii (> 0x2000) seen
+**RADIUS != SEPARATION**, so "the camera measured against the wrong dragon" is
+NOT confirmed, and that was the hypothesis this probe was built to test.
+**AND 9,793 IS TOO SMALL TO EXPLAIN THE SYMPTOM.** With a sane focus, a radius
+of ten thousand bounds the camera to ten thousand units from the dragon — it
+cannot produce the 54-million-unit position of the August dump. So either the
+symptom is now milder than it was, or **the position is going wrong by a third
+route that is neither the focus nor the radius**, and the arithmetic that has
+guided this whole hunt does not cover it.
+
+**WHAT THE NEXT ATTEMPT SHOULD DO DIFFERENTLY.**
+1. **Latch the WORST event, not the most recent.** This probe recorded
+   most-recent, so its sample may be an ordinary mild excursion rather than the
+   spasm frame — the reading above cannot be trusted to describe the fault.
+   Record max-radius-seen alongside the position at that moment.
+2. **Watch `m_Position` DIRECTLY as well as its inputs.** Every round of this
+   hunt has assumed position is derived from focus and radius. If both are sane
+   and the position still explodes, something WRITES m_Position — and the
+   overlays do exactly that: `func_level_20_8007E3A0` calls `func_800342F8` and
+   `func_80033F08`, and seven overlays do the same. That lead has been on the
+   board since 2026-08-27 and has never been instrumented.
+3. Note the collision gates still fire hard (175 query / 36 probe refusals in
+   this session; 1088 / 846 in a longer one), so genuinely impossible geometry
+   still reaches collision with a healthy focus. **Logging the gate's CALLER
+   is now trivial** — in the port they are ordinary C wrappers, so
+   `__builtin_return_address(0)` names the culprit with no entry patch. That is
+   the cheapest unexplored instrument on the board.
+
+**PROCESS NOTE, and it cost this session an hour.** I sent the user to read
+focus-repair counters at 0x8000ED70-ED7C that **nothing had written since
+2026-08-30**, because this file still described `Sp1x2FixFocus` as live and
+even said "do not retire it again without a measurement showing the counter
+stays zero". The retirement note in Sp1x2Gates.c was correct and complete and
+was never going to be found by anyone following this log. **A retirement must
+be recorded in EVERY place that tells someone to read the instrument** — the
+code comment is not enough. Both files now say dead.
+
 ## CAMERA SPASM — one more theory RULED OUT, and the best remaining lead
 
 RULED OUT: "a death or game over leaves the state crossed, and clearing

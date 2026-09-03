@@ -137,3 +137,13 @@ everything beyond the intro is still lightly tested.*
   cannot grow at all (see `docs/decomp/README.md`).
 
 ---
+
+**2026-09-02 update.** Two theories closed and one fact gained; still open.
+The null focus (`g_Spyro + 0x21C` uninitialised, stored unchecked into
+`m_Focus`) was real, is fixed, and was **not** the cause — the spasm survives
+with the focus provably healthy. The follow radius goes bad **only on player
+2's camera update** (34 times in a session, player 1 never), but at ~9,793 it
+is far too small to explain the symptom, and it does not match the
+inter-player distance. So the camera's position is going wrong by some route
+that is neither its focus nor its radius. Full detail, and what to instrument
+next, in `CLAUDE.md`. Stopped by agreement, not because it is unfixable.
