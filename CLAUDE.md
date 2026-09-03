@@ -261,6 +261,27 @@ SP1X2_P2_READY disables the swap that would uncross it". It explained one
 session and contradicted the next, and one address read finished it:
 **0x8000ED00 reads 1 throughout**, so the swap was never disabled. Cost: one
 memory read instead of three builds. Keep doing that.
+**CORRECTION 2026-09-02: Sp1x2FixFocus WAS RETIRED on 2026-08-30 and the
+counters at 0x8000ED70-ED7C ARE DEAD.** This section still read as though the
+repair were live, and its instruction "do not retire it again without a
+measurement showing the counter stays zero" sent a later session to read four
+addresses that nothing writes. Zero there means THE CODE IS ABSENT, not that
+the focus is healthy. **A retirement must be recorded in every section that
+tells someone to read the instrument** — the retirement note in
+Sp1x2Gates.c was correct and complete, and was never going to be found by
+someone following this file.
+
+MEASURED 2026-09-02, and it revises the lead below: g_Spyro + 0x21C is NULL
+for BOTH players, not just player 2 (live 0x80078C74 = 0, P2 shadow
+0x8000EA1C = 0), in the Peace Keepers homeworld. Every writer of that field in
+the whole game is in a level overlay (32/33/34/50/61) and this level is not
+one of them, so nothing ever initialises it for anyone. The unchecked pair at
+0x80040214 (lw from +0x21C) / 0x80040234 (sw into m_Focus) is confirmed in the
+instruction stream, and none of the 17 stores to m_Focus anywhere writes a
+literal zero. So the null can only arrive through that one instruction.
+STILL UNKNOWN, and the next test: whether that branch ever executes in a level
+where the field is null. A breakpoint at 0x80040234 settles it either way.
+
 **THE BEST REMAINING LEAD, and it is grounded in measurement rather than
 reasoning.** We know from the focus probe that during a spasm
 `g_Camera.m_Focus` is NULL and the camera is dutifully following address zero.

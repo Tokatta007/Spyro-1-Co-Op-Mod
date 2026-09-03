@@ -120,10 +120,10 @@ Payload arithmetic, all of which must agree: `PAYLOAD_BYTES = 0x2800`;
 | `0x8000ED30`–`0x8000ED43` | 20 | True-start cache (levelId, x, y, z, rot) — preferred respawn point. | `Sp1x2Graphics.c` / `Sp1x2Spyro.c` |
 | `0x8000ED60` | 4 | Collision **query** gate refusals. | `Sp1x2Gates.c` |
 | `0x8000ED64` | 4 | Collision **probe** gate refusals. | `Sp1x2Gates.c` |
-| `0x8000ED70` | 4 | Focus repairs before P1's update — reserved; nothing calls slot 0. | `Sp1x2Gates.c` |
-| `0x8000ED74` | 4 | Focus repairs **before** P2's camera update. | `Sp1x2Gates.c` |
-| `0x8000ED78` | 4 | Focus repairs **after** P2's camera update. If only this climbs, the null is written inside the update itself. | `Sp1x2Gates.c` |
-| `0x8000ED7C` | 4 | P2's camera Z at an after-repair — how far it had flown. | `Sp1x2Gates.c` |
+| `0x8000ED70` | 4 | **DEAD** — was focus repairs before P1's update. `Sp1x2FixFocus` retired 2026-08-30; nothing writes this. | — |
+| `0x8000ED74` | 4 | **DEAD** — was focus repairs before P2's camera update. Reads 0 because the code is gone, not because the focus is healthy. | — |
+| `0x8000ED78` | 4 | **DEAD** — was focus repairs after P2's camera update. | — |
+| `0x8000ED7C` | 4 | **DEAD** — was P2's camera Z at an after-repair. | — |
 | `0x8000EE00`–`0x8000EF0F` | `0x110` | P2's camera shadow (full `g_Camera` copy). | `Sp1x2Spyro.c` (read `+0x28` by `Sp1x2Pad.c`) |
 | `0x8000EF10`–`0x8000EF1F` | 16 | P2's copy of the four camera globals outside `g_Camera`. | `Sp1x2Spyro.c` |
 | `0x8000F000`–`0x8000F0FF` | `0x100` | Markers / diagnostics. **Declared only — nothing writes here now.** | `Sp1x2Graphics.c` / `Sp1x2Spyro.c` |
