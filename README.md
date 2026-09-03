@@ -2,6 +2,8 @@
 
 Split-screen co-op for **Spyro the Dragon** (PlayStation, NTSC).
 
+![Two dragons playing together in a horizontal split screen, each viewport following its own player](docs/images/split-horizontal.jpg)
+
 This mod features drop-in drop-out split-screen co-op that is fairly
 functional, with only a few minor bugs. This includes a Multiplayer settings
 page to customize your experience. Currently it is for only 2 players, but
@@ -28,6 +30,26 @@ preserved.
 
 [BUGS.md](BUGS.md) lists what is still open, including two parked issues: a
 camera glitch on some hits, and pitch control in the flight levels.
+
+## Screenshots
+
+![Vertical side-by-side split, both dragons with their own Sparx dragonfly](docs/images/split-vertical.jpg)
+
+*Vertical split. Each dragon keeps his own camera, his own Sparx, and his own
+half of the screen.*
+
+![The Multiplayer page of the pause menu, showing Players, Split, Widescreen, View and Done](docs/images/multiplayer-menu.jpg)
+
+*The Multiplayer page, built as a real substate of the game's own pause menu -
+its text routine, its box, its letter wobble, and its menu chimes.*
+
+![The pause options screen with the hint SQUARE MULTIPLAYER along the bottom](docs/images/pause-hint.jpg)
+
+*SQUARE opens it from the options screen.*
+
+![Both dragons flying side by side on the Returning Home transition screen](docs/images/returning-home.jpg)
+
+*Level transitions show both dragons, flying in formation.*
 
 ## Playing it
 
