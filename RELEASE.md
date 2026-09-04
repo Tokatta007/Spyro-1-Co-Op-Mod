@@ -15,10 +15,13 @@ menu. Drop in and out at any time.
 
 ## Files
 
+Download **`spyro1-coop-v0.2.zip`** and unzip it. Inside:
+
 | file | |
 | --- | --- |
 | `spyro1-coop-v0.2.xdelta` | the patch — apply to your own disc image |
 | `spyro1-coop-v0.2.cue` | keep beside the patched `.bin`, and open this |
+| `README.txt` | the same instructions, offline |
 
 - Apply to a *Spyro the Dragon (USA)* `.bin` with SHA-1
   `cf3ce6bedeb89dfbc40990336180f3b9b0f40d9f`
