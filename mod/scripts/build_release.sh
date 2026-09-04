@@ -81,7 +81,13 @@ cp rom/WAD.WAD build/rom/WAD.WAD
 
 say "building the patch, and verifying it round-trips"
 mkdir -p build/release
-xdelta3 -e -9 -f -s disc/spyro1.bin "build/disc/$NAME.bin" "build/release/$NAME.xdelta"
+# -S none disables xdelta's SECONDARY COMPRESSOR (DJW Huffman), which -9 turns
+# on by default. Browser-based patchers - Rom Patcher JS, which romhacking.net
+# and most "patch it online" pages use - do not implement secondary
+# decompressors and fail with "not implemented: secondary decompressor".
+# A user hit exactly that on v0.2. It costs about 65 KB on a 520 KB patch,
+# which is nothing against a patch nobody can apply.
+xdelta3 -e -9 -S none -f -s disc/spyro1.bin "build/disc/$NAME.bin" "build/release/$NAME.xdelta"
 xdelta3 -d -f -s disc/spyro1.bin "build/release/$NAME.xdelta" build/release/roundtrip.bin
 built=$(shasum "build/disc/$NAME.bin" | cut -d' ' -f1)
 back=$(shasum build/release/roundtrip.bin | cut -d' ' -f1)
