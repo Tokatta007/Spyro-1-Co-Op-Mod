@@ -24,8 +24,14 @@ menu. Drop in and out at any time.
   `cf3ce6bedeb89dfbc40990336180f3b9b0f40d9f`
 - The patched `.bin` should come out as SHA-1
   `8d6ac27e58b0ff652950cf3d3363e35f6dd004ee`
-- Use an xdelta patcher such as
-  [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher)
+- Patch it with [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher),
+  or online at [romhacking.net](https://www.romhacking.net/patch/) — nothing to
+  install
+
+**Check both hashes.** Almost every "it crashed" report comes down to one of
+them being wrong: a different disc dump going in, or a patch that did not apply
+cleanly coming out. If your patcher reports *"not implemented: secondary
+decompressor"*, you have the original v0.2 patch — download it again.
 
 No game data is included — the patch is only the difference between your disc
 and the modded one, which is why it can be shared when the game cannot.
@@ -57,7 +63,7 @@ rather than patched into the retail executable. That is what allows the level
 overlays to be rebuilt, which is the only route to several fixes — the
 flight-level HUD among them.
 
-The patch is around 500 KB. Almost all of that is the game's own code, which
+The patch is around 600 KB. Almost all of that is the game's own code, which
 this build recompiles; the mod itself is about 11 KB.
 
 Built with `mod/scripts/build_release.sh`, which verifies the patch by
