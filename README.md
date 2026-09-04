@@ -60,8 +60,9 @@ You will need:
 
 - Your own copy of *Spyro the Dragon (USA)* as a `.bin`/`.cue` disc image.
   Verified against SHA-1 `cf3ce6bedeb89dfbc40990336180f3b9b0f40d9f`.
-- An xdelta patcher, such as
-  [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher).
+- A patcher. [romhacking.net's online one](https://www.romhacking.net/patch/)
+  needs nothing installed; [Delta Patcher](https://github.com/marco-calautti/DeltaPatcher)
+  is the desktop equivalent.
 - An emulator or real hardware. **DuckStation** is what this is tested on.
 - Two controllers. A CPU overclock of 300% is recommended to keep the
   framerate high. It's best to not go above it or it could result in crashes.
