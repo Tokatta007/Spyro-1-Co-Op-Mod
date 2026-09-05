@@ -26,3 +26,7 @@ tools/
 
 # macOS
 .DS_Store
+
+# Private working notes — correspondence and anything not ours to publish.
+# The repository is public; this directory is not.
+docs/private/
