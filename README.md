@@ -23,6 +23,9 @@ preserved.
 - Drop-in / drop-out Co-Op: switch between one and two players from the pause
   menu
 - Enemies, gems, and fodder react to the nearest player
+- Per-player dragon colour, set from the pause menu — eight dials, a live
+  swatch each, and both dragons keep their colour through portals, cutscenes
+  and dialogue
 - Shared lives, with individual death and respawn
 - Dragon rescues, the balloonist, portals, and level transitions all handled
 
@@ -30,6 +33,14 @@ preserved.
 camera glitch on some hits, and pitch control in the flight levels.
 
 ## Screenshots
+
+**Per-player colour**
+
+![Two Spyros in a split screen, one magenta and one green](docs/images/color-in-game.jpg)
+
+**The colour menu**
+
+![The pause menu's COLOR page, showing red, green, blue and tint dials for each player with a coloured swatch above the box](docs/images/color-menu.jpg)
 
 **Vertical split**
 

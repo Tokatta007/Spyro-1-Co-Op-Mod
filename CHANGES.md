@@ -127,6 +127,9 @@ Payload arithmetic, all of which must agree: `PAYLOAD_BYTES = 0x2800`;
 | `0x8000EE00`–`0x8000EF0F` | `0x110` | P2's camera shadow (full `g_Camera` copy). | `Sp1x2Spyro.c` (read `+0x28` by `Sp1x2Pad.c`) |
 | `0x8000EF10`–`0x8000EF1F` | 16 | P2's copy of the four camera globals outside `g_Camera`. | `Sp1x2Spyro.c` |
 | `0x8000F000`–`0x8000F0FF` | `0x100` | Markers / diagnostics. **Declared only — nothing writes here now.** | `Sp1x2Graphics.c` / `Sp1x2Spyro.c` |
+| `0x8000F1E0`–`0x8000F1E7` | 8 | **Per-player colour**: red, green, blue, strength, one set each. Written into `g_Spyro.m_colorFilter` (+0x28) every frame. | `Sp1x2Menu.c` / `Sp1x2Spyro.c` |
+| `0x8000F1F0` | 4 | Preview swatch spin angle (unused since the model preview was abandoned). | `Sp1x2Menu.c` |
+| `0x8000F1F4` | 4 | Colour-defaults seeded flag. Separate from the values because the default STRENGTH is 0, so no value can mark "already set". | `Sp1x2Menu.c` |
 | `0x8000F100`–`0x8000F17F` | 128 | Flame matrix chains: one 5-word chain per (dragon, viewport), at `+player*0x40 + pass*0x20`. | `Sp1x2Graphics.c` |
 | `0x8000F180` | 4 | `SP1X2_SPLIT_MODE` — 1 = vertical, else horizontal. | `Sp1.h` / `Sp1x2Menu.c` |
 | `0x8000F188` | 4 | `SP1X2_WIDESCREEN` — anamorphic 16:9 on/off. | `Sp1.h` / `Sp1x2Menu.c` |

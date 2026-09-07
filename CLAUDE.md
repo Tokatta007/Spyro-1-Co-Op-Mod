@@ -400,6 +400,87 @@ NOTE the collision guards are NOT implicated — this crash never touched bad
 memory (BadVAddr 0). Read 0x8000ED60 / 0x8000ED64 at the next freeze to
 confirm which class it is before assuming.
 
+## PER-PLAYER COLOUR SHIPPED 2026-09-07 — AND A FREEZE THAT WAS PURE SPACE
+
+Two dragons, two colours, a COLOR page in the pause menu with eight dials and
+a live swatch each. Reached by Pause > Options > SQUARE > COLOR.
+
+**THE MECHANISM IS THE GAME'S OWN, AND IT IS WHAT SPYRO 2 SHIPPED.**
+`g_Spyro.m_colorFilter` (+0x28, verified in the disassembly as `sb v1,40(v0)`)
+is three colour channels plus an INTERPOLATION STRENGTH, blended with the
+vertex colours. Spyro 2's colour cheat codes are documented as changing "the
+color tint, not the actual textures, so if you use yellow he won't really be
+yellow" — the same mechanism and the same limitation, shipped by Insomniac as
+a feature. It costs FOUR BYTES per player and sits inside `g_Spyro`, which is
+already swapped, so per-player was free.
+
+**TEN BUILDS WENT INTO RECOLOURING THE MODEL INSTEAD, AND IT CANNOT WORK.**
+Spyro's model carries ONE 123-entry table at `AnimationHeader.m_Colors`, 492
+bytes, shared by all 25 animations and every body part (0x801C8350 in the
+Peace Keepers homeworld; `m_NumAnimations` reads -1 and is junk for this
+model, which is why the game hardcodes 46). Painting it DOES change him — but
+**HE IS TEXTURED**, and those entries are per-vertex MODULATION over the
+texture, not colour. Two things prove it: multiplying by red produced DARK
+MAROON (red over purple), not red; and the user found the texture sheet.
+**THE ENTRIES ENCODE LIGHTING, NOT MATERIAL** — neutral-lit vertices occur on
+horns, belly and body alike — so no rule over them can select a body part.
+Every "recolour only the body" attempt was structurally impossible. DO NOT
+RETRY.
+
+**THE PROCESS LESSON, and it cost two rounds: A TEST THAT CLASSIFIES ITS OWN
+OUTPUT MUST BE IDEMPOTENT OR APPLY ONCE.** Two paint tests classified palette
+entries by colour value while running every frame, so frame 2 re-read frame
+1's output and re-classified it — within two frames everything was one colour.
+The reading was true of the screen and false about Spyro, and the next build
+was aimed with it. Tests that painted by INDEX were immune and every surviving
+conclusion came from those.
+
+**THE PREVIEW DRAGONS: FIVE ATTEMPTS, NEVER DREW, ABANDONED.** A probe proved
+`RasterizePairedActor` emits ~7,780 bytes of primitives per dragon from the
+pause draw, and placement was ruled out by drawing them beside the live dragon
+in plain view — still nothing. With the preview live, unpausing stalled for
+2-3 seconds, the shape of a damaged ordering table. **THE PAUSED WORLD IS NOT
+RENDERED IN 3D**: func_8001A40C composes the scene ONCE, StoreImages the
+framebuffer into VRAM as a texture, and every frame after draws FOUR TEXTURED
+QUADS of it with g_GrayscalePalette as their CLUT — that is the green wash.
+The pause TEXT renders because HUD mobys use a separate screen-space path.
+What is still unknown is which list the handler submits and how the model
+renderer's links relate to it.
+**WHAT WORKED INSTEAD: A FLAT QUAD.** The pause screen already draws
+POLY_F4s for its own box (draw.c:188-204) — build one at the primitive cursor,
+colour it, link with func_800168DC, advance the cursor. Bordered with
+func_8001844C, the box's own line routine, so it picks up the identical
+shimmering gold. **When a mechanism keeps failing, look at what the screen you
+are drawing on ALREADY draws.**
+
+**THE FREEZE, AND IT WAS NOT THE COLOUR CODE AT ALL — IT WAS SIZE.**
+Every death froze: the animation played, then the game hung at respawn.
+`.coop_bios2b` is padded to 0x880 on disc but **THE BOOT COPIER MOVES ONLY
+0x400 OF IT INTO RAM**; the rest is sector padding that never arrives. The
+colour menu's STRINGS grew that region until `Sp1x2Ground` — the RESPAWN
+GROUNDING FUNCTION — started at offset 0x3B0 with size 0x74, ending at 0x424.
+**ITS LAST 36 BYTES WERE NEVER LOADED.** Every death called into code that did
+not exist. Fixed by moving Sp1x2Ground.o into BIOS2, which is fully copied.
+**MY OWN REGION CHECK REPORTED THIS THREE TIMES (1060/1024, 1044, 1060) AND I
+DISMISSED IT EACH TIME AS A MEASURING ARTEFACT, BECAUSE THE LINKER WAS
+SILENT.** The linker was silent because NOTHING WAS CHECKING THAT LIMIT — the
+region has no enforced length, only a copier that stops at 0x400. There is now
+an `ASSERT(coop_bios2b_used <= 0x8000E800)` in psx.ld that fails the build on
+any overrun; it caught a real one on its first run. **A REGION WHOSE LIMIT IS
+ENFORCED BY A COPY LOOP RATHER THAN BY THE LINKER NEEDS ITS OWN ASSERT.**
+Note `.` inside that section reads as an ABSOLUTE address despite the padding
+being written as a plain 0x880 — comparing against 0x400 fired unconditionally
+and cost a round.
+
+**SPACE IS NOW THE BINDING CONSTRAINT AGAIN: LOADER 12 free, BIOS2 0 (EXACTLY
+FULL), BIOS2B 88.** The next addition to BIOS2 needs something moved out
+first — most likely into the executable padding the modern compiler freed.
+
+**STILL WRONG, COSMETIC:** during a handover the LIVE dragon is player 2, but
+`Sp1x2TintBoth` assumes live means player 1 — so a player-2 balloonist
+conversation shows player 1's colour. The fix is to consult the handover flag
+at 0x8000ED08, and there is no room for it in BIOS2 today.
+
 ## PER-PLAYER SPYRO COLOUR — THE EASY LEVER EXISTS (2026-08-30)
 
 **`g_Spyro.m_colorFilter` at +0x28 (0x80078A80)** — four bytes: red, green,
