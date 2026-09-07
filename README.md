@@ -20,12 +20,12 @@ preserved.
 - Two players, independent movement, cameras, and Sparx
 - Horizontal or vertical split, three view-fit modes, and optional 16:9
   widescreen
-- Drop-in / drop-out Co-Op: switch between one and two players from the pause
+- Drop-in and drop-out co-op: switch between one and two players from the pause
   menu
 - Enemies, gems, and fodder react to the nearest player
-- Per-player dragon colour, set from the pause menu — eight dials, a live
-  swatch each, and both dragons keep their colour through portals, cutscenes
-  and dialogue
+- Per-player dragon color, set from the added multiplayer menu. Eight dials, a
+  live color preview, and both dragons keep their color through portals,
+  cutscenes, and dialogue
 - Shared lives, with individual death and respawn
 - Dragon rescues, the balloonist, portals, and level transitions all handled
 
@@ -33,14 +33,6 @@ preserved.
 camera glitch on some hits, and pitch control in the flight levels.
 
 ## Screenshots
-
-**Per-player colour**
-
-![Two Spyros in a split screen, one magenta and one green](docs/images/color-in-game.jpg)
-
-**The colour menu**
-
-![The pause menu's COLOR page, showing red, green, blue and tint dials for each player with a coloured swatch above the box](docs/images/color-menu.jpg)
 
 **Vertical split**
 
@@ -61,6 +53,14 @@ camera glitch on some hits, and pitch control in the flight levels.
 **Level transition**
 
 ![Both dragons flying side by side on the Returning Home transition screen](docs/images/returning-home.jpg)
+
+**Per-player color**
+
+![Two Spyros in a split screen, one magenta and one green](docs/images/color-in-game.jpg)
+
+**The color menu**
+
+![The pause menu's COLOR page, showing red, green, blue, and tint dials for each player with a colored swatch above the box](docs/images/color-menu.jpg)
 
 ## Playing it
 
@@ -127,7 +127,7 @@ The mod exists in **two constructions**, and it matters which one you build.
 **The one that ships** is compiled inside
 [TheMobyCollective's decompilation](https://github.com/TheMobyCollective/spyro-1),
 because that is the only construction that can rebuild the game's level
-overlays — which several fixes, including the flight-level HUD, depend on.
+overlays, which several fixes, including the flight-level HUD, depend on.
 
 ```sh
 ./mod/scripts/build_release.sh v0.2
@@ -153,7 +153,7 @@ make           # builds the executable and runs the verification gate
 make disc      # repacks the playable disc
 ```
 
-`make` alone does **not** produce a playable disc — `make disc` does. This path
+`make` alone does **not** produce a playable disc; `make disc` does. This path
 needs a `mipsel-none-elf` GCC cross-compiler (the PlayStation runs a MIPS
 processor, so the code has to be built by a compiler that targets it rather
 than your own machine), Python 3, and
@@ -175,12 +175,12 @@ as code, and [BUGS.md](BUGS.md) is an honest list of what is still wrong.
 
 ## Credits
 
-- **Spyromain** — [Spyro2x2](https://github.com/Spyromain/Spyro2x2), the
+- **Spyromain**: [Spyro2x2](https://github.com/Spyromain/Spyro2x2), the
   reference implementation this is ported from, and generous advice besides.
-- **TheMobyCollective** — [spyro-1](https://github.com/TheMobyCollective/spyro-1)
+- **TheMobyCollective**: [spyro-1](https://github.com/TheMobyCollective/spyro-1)
   decompilation, the source of nearly every struct and function name here.
 - The **Mod the Dragon** community, for pointers that saved real work.
 
-## Licence
+## License
 
 MIT. See [LICENSE](LICENSE).
