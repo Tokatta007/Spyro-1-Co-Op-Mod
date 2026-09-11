@@ -4,9 +4,22 @@ Split-screen co-op for **Spyro the Dragon** (PlayStation, NTSC).
 
 This mod features drop-in drop-out split-screen co-op that is fairly
 functional, with only a few minor bugs. This includes a Multiplayer settings
-page to customize your experience. Currently it is for only 2 players, but
-**the goal is up to four players in split-screen, and to release this on
-OpenPete.**
+page to customize your experience. It is for two players.
+
+> **Active development has moved to [OpenPete](https://openpete.com/), the
+> native PC port of Spyro 1.** The PlayStation is at the end of what it can
+> give this mod: the code lives in about 11 KB of BIOS scratch RAM because the
+> game's address space is full, and drawing the scene twice already costs half
+> the framerate at a 300% overclock. Four-player split-screen is not reachable
+> here, and it is reachable there.
+>
+> This repository stays up as the finished PS1 version and as the reference
+> implementation — `CHANGES.md` documents every hook, allocation and swapped
+> region, and that is what the port is built from. The patch below still works
+> and is still supported.
+>
+> The port lives at
+> **[Spyro-1-CoOp-OpenPete](https://github.com/Tokatta007/Spyro-1-CoOp-OpenPete)**.
 
 Built by studying and porting the architecture of
 [Spyromain's incredible Spyro2x2 mod](https://github.com/Spyromain/Spyro2x2),

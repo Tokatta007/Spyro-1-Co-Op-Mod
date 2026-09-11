@@ -887,8 +887,18 @@ The user is **new to coding**. Please:
   look right", **PCSX-Redux** for anything needing the memory viewer,
   debugger or exact BIOS behaviour. Never leave it implied.
 
-They have a little terminal experience and are on **macOS**. Use macOS commands
-(`shasum`, not `sha1sum`; Homebrew for installs).
+They have a little terminal experience. **As of 2026-09-11 they are on Windows
+11, using PowerShell** — the project moved off the Mac laptop. Use PowerShell
+commands (`Get-FileHash`, not `shasum`; `winget`, not Homebrew). PowerShell 5.1
+has no `&&`, no ternary and no `??`; chain with `;` and `if ($?)`.
+
+Everything below about the macOS toolchain is **history, not instructions**. It
+records how this mod was built on the machine it was built on, and it is worth
+keeping for that reason, but none of it is a current environment note.
+
+**Active development has moved to the OpenPete port**, in the sibling
+repository `../Spyro-1-CoOp-OpenPete`. This repository is the finished PS1
+version and the reference implementation. See its `docs/PORTING.md`.
 
 ## What this project is
 
