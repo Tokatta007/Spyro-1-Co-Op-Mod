@@ -19,7 +19,7 @@ page to customize your experience. It is for two players.
 > and is still supported.
 >
 > The port lives at
-> **[Spyro-1-CoOp-OpenPete](https://github.com/Tokatta007/Spyro-1-CoOp-OpenPete)**.
+> **[Spyro-1-Co-Op-OpenPete](https://github.com/Tokatta007/Spyro-1-Co-Op-OpenPete)**.
 
 Built by studying and porting the architecture of
 [Spyromain's incredible Spyro2x2 mod](https://github.com/Spyromain/Spyro2x2),
