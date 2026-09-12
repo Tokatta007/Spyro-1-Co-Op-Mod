@@ -897,7 +897,7 @@ records how this mod was built on the machine it was built on, and it is worth
 keeping for that reason, but none of it is a current environment note.
 
 **Active development has moved to the OpenPete port**, in the sibling
-repository `../Spyro-1-CoOp-OpenPete`. This repository is the finished PS1
+repository `../Spyro-1-Co-Op-OpenPete`. This repository is the finished PS1
 version and the reference implementation. See its `docs/PORTING.md`.
 
 ## What this project is
